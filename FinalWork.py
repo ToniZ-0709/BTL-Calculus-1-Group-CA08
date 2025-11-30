@@ -126,13 +126,13 @@ class CalculusIntroScene(Scene):
         # Part 1: Title and Basic Formula
         title = Text("What is Integration?", font_size = 48, color=BLUE, font=TITLE_FONT)
         title.to_edge(UP)
-        self.play(Write(title), runtime = 1.5)
+        self.play(Write(title), runtime = 2)
         self.wait(1.5)
 
         formula = MathTex("\\int_{a}^{b} f(x) dx = F(b) - F(a)", font_size = 36)
         formula.next_to(title, DOWN, buff=0.5)
         self.play(Write(formula), runtime = 1.5)
-        self.wait(2)
+        self.wait(1.5)
 
         # Clear for next part
         self.play(FadeOut(title), FadeOut(formula))
@@ -270,7 +270,7 @@ class CalculusIntroScene(Scene):
         title = Text("Riemann Sums and Area Approximation", font = TITLE_FONT, font_size=48, color=BLUE)
         title.to_edge(UP)
         self.play(Write(title), run_time=2)
-        self.wait(2) 
+        self.wait(1.5) 
         
         # Formula for xi and delta x
         formulas = VGroup(
@@ -436,4 +436,102 @@ class CalculusIntroScene(Scene):
             FadeOut(graph),
             FadeOut(func_label1),
             run_time=2
+        )
+        #------------------------------------------------------------------------------------#
+        #------------------------------------------------------------------------------------#
+        #------------------------------------------------------------------------------------#
+        #------------------------------------------------------------------------------------#
+        # Title
+        TITLE_FONT = "Times New Roman"
+        title = Text("Fundamental Theorem of Calculus", font_size=48, color=BLUE, font=TITLE_FONT)
+        title.to_edge(UP)
+        self.play(Write(title), runtime = 2)
+        self.wait(1.5)
+
+        # Part 1: Derivative of the Integral
+        part1_title = Text("Part 1: Derivative of the Integral", font_size=36, color=YELLOW, font=TITLE_FONT)
+        part1_title.next_to(title, DOWN, buff=0.5)
+        self.play(Write(part1_title), runtime = 1.5)
+        self.wait(1.5)
+
+        # FTC Part 1 formula
+        ftc1_formula = MathTex(
+            "\\frac{d}{dx} \\int_a^x f(t) dt = f(x)",
+            font_size=40,
+            color=GREEN
+        )
+        ftc1_formula.next_to(part1_title, DOWN, buff=0.8)
+        self.play(Write(ftc1_formula), runtime = 1.5)
+        self.wait(2)
+
+        # Explanation of Part 1
+        explanation1 = VGroup(
+            Text("• The derivative 'undoes' the integral", font_size=24),
+            Text("• Rate of change of accumulated area = The original function", font_size=24),
+            Text("• If F(x) = ∫f(t)dt from a to x, then F'(x) = f(x)", font_size=24)
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
+
+        explanation1.next_to(ftc1_formula, DOWN, buff=0.8)
+        
+        for item in explanation1:
+            self.play(Write(item), run_time = 2)
+            self.wait(1.5)
+        
+        self.wait(3)
+
+        # Clear for Part 2
+        self.play(
+            FadeOut(part1_title),
+            FadeOut(ftc1_formula),
+            FadeOut(explanation1)
+        )
+
+        # Part 2: Evaluation of Definite Integrals
+        part2_title = Text("Part 2: Evaluation using Antiderivative", font_size=36, color=ORANGE, font=TITLE_FONT)
+        part2_title.next_to(title, DOWN, buff=0.5)
+        self.play(Write(part2_title), runtime = 1.5)
+        self.wait(1.5)
+
+        # FTC Part 2 formula
+        ftc2_formula = MathTex(
+            "\\int_a^b f(x) dx = F(b) - F(a)",
+            font_size=40,
+            color=GREEN
+        )
+        ftc2_formula.next_to(part2_title, DOWN, buff=0.8)
+        self.play(Write(ftc2_formula), runtime = 1.5)
+        self.wait(2)
+
+        # Where F is antiderivative
+        where_F = MathTex(
+            "\\text{where } F'(x) = f(x)",
+            font_size=30,
+            color=WHITE
+        )
+        where_F.next_to(ftc2_formula, DOWN, buff=0.3)
+        self.play(Write(where_F))
+        self.wait(1)
+
+        # Explanation of Part 2
+        explanation2 = VGroup(
+            Text("• To compute definite integral, find the antiderivative F(x)", font_size=24),
+            Text("• Evaluate F(x) at upper and lower limits", font_size=24),
+            Text("• Subtract: F(b) - F(a)", font_size=24),
+            Text("• This gives the exact area under the curve", font_size=24)
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.2)
+
+        explanation2.next_to(where_F, DOWN, buff=0.8)
+        
+        for item in explanation2:
+            self.play(Write(item), run_time=2)
+            self.wait(1.5)
+        
+        self.wait(3)
+
+        # Clear for example
+        self.play(
+            FadeOut(part2_title),
+            FadeOut(ftc2_formula),
+            FadeOut(where_F),
+            FadeOut(explanation2)
         )
