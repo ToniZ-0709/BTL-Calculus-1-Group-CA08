@@ -124,7 +124,6 @@ class CalculusIntroScene(Scene):
         #------------------------------------------------------------------------------------#
         #------------------------------------------------------------------------------------#
         # Part 1: Title and Basic Formula
-        global title
         title = Text("What is Integration?", font_size = 48, color=BLUE, font=TITLE_FONT)
         title.to_edge(UP)
         self.play(Write(title), run_time = 2)
@@ -133,7 +132,7 @@ class CalculusIntroScene(Scene):
         formula = MathTex("\\int_{a}^{b} f(x) dx = F(b) - F(a)", font_size = 36)
         formula.next_to(title, DOWN, buff=0.5)
         self.play(Write(formula), run_time = 1.5)
-        self.wait(1.5)
+        self.wait(2.5)
 
         # Clear for next part
         self.play(FadeOut(title), FadeOut(formula))
@@ -197,9 +196,9 @@ class CalculusIntroScene(Scene):
             self.play(
                 Write(item[0], run_time=1),
                 FadeIn(item[1], shift=RIGHT, run_time=0.8),
-                run_time = 1.5
+                run_time = 1.2
             )
-            self.wait(1.2)
+            self.wait(1)
             
         self.wait(2)
         self.play(
@@ -347,7 +346,7 @@ class CalculusIntroScene(Scene):
         self.show_smooth_riemann_transition(axes, graph, a, b, func)
         
         # Transition to integral - normal speed
-        self.transition_to_integral(axes, graph, a, b, func)
+        self.transition_to_integral(axes, graph, a, b, func, title)
         
     def show_smooth_riemann_transition(self, axes, graph, a, b, func):
         n = 5
@@ -421,8 +420,9 @@ class CalculusIntroScene(Scene):
         # Update references
         self.rectangles = new_rectangles
     
-    def transition_to_integral(self, axes, graph, a, b, func):
+    def transition_to_integral(self, axes, graph, a, b, func, title):
         # Clear previous elements
+        self.wait(2)
         self.play(
             FadeOut(self.rectangles),
             FadeOut(self.riemann_sum_text),
@@ -693,15 +693,20 @@ class CalculusIntroScene(Scene):
         #------------------------------------------------------------------------------------#
         #------------------------------------------------------------------------------------#
         #------------------------------------------------------------------------------------#
-        # Problem 1
-        # Title for Exercise section
+        self.problem1()
+        self.problem2()   
+
+    # ------------------------------------------------------------
+    # PROBLEM 1
+    # ------------------------------------------------------------
+    def problem1(self):
         TITLE_FONT = "Times New Roman"
+        
         title = Text("Problem 1: Find the Value of m", font_size=48, color=BLUE, font = TITLE_FONT)
         title.to_edge(UP)
         self.play(Write(title), run_time = 2)
         self.wait(1.5)
         
-        # Problem statement
         problem = VGroup(
             Text("Find positive m such that:", font_size=32, color=WHITE),
             MathTex("\\text{Area bounded by } y = 2x + 3, y = 0, x = 0, x = m \\text{ equals } 10", font_size=32)
@@ -712,70 +717,52 @@ class CalculusIntroScene(Scene):
         self.play(Write(problem), run_time = 4)
         self.wait(4)
         
-        # Clear for solution
         self.play(FadeOut(problem))
-        
-        # Mathematical solution
         self.show_solution(title)
-        
-        # Draw the figure after solution
         self.draw_final_figure(title)
-        
-        # Final FadeOut for the main scene elements
-        self.play(FadeOut(title), run_time=1.5)
         self.wait(0.5)
-    
+
     def show_solution(self, title):
-        # Step 1: Set up the integral
         step1 = MathTex("\\text{Area} = \\int_0^m (2x + 3) dx = 10", font_size=36)
         step1.next_to(title, DOWN, buff=0.8)
         self.play(Write(step1))
         self.wait(2)
         
-        # Step 2: Find antiderivative
         step2 = MathTex("F(x) = x^2 + 3x", font_size=36)
         step2.next_to(step1, DOWN, buff=0.5)
         self.play(Write(step2), run_time = 2)
         self.wait(2)
         
-        # Step 3: Apply FTC
         step3 = MathTex("\\Rightarrow F(m) - F(0) = m^2 + 3m", font_size=36)
         step3.next_to(step2, DOWN, buff=0.5)
         self.play(Write(step3), run_time = 2)
         self.wait(2)
         
-        # Step 4: Set up equation
         step4 = MathTex("\iff m^2 + 3m = 10", font_size=36)
         step4.next_to(step3, DOWN, buff=0.5)
         self.play(Write(step4))
         self.wait(2)
         
-        # Step 7: Solutions (Implicitly solving m^2 + 3m - 10 = 0)
         step7 = MathTex("\iff m = -5 \\quad \\text{or} \\quad m = 2", font_size=36)
         step7.next_to(step4, DOWN, buff=0.5)
         self.play(Write(step7))
         self.wait(2)
         
-        # Step 8: Select positive solution
         step8 = MathTex("m > 0 \\Rightarrow m = 2", font_size=36, color=GREEN)
         step8.next_to(step7, DOWN, buff=0.5)
         self.play(Write(step8), run_time = 2)
         self.wait(2)
         
-        # Store steps for later fade out
         self.solution_steps = VGroup(step1, step2, step3, step4, step7, step8)
-    
+
     def draw_final_figure(self, title):
-        # Clear the solution steps
         self.play(FadeOut(self.solution_steps))
         
-        # Create final figure title
         final_title = Text("Final Solution: m = 2", font_size=24, color=GOLD)
         final_title.next_to(title, DOWN, buff=0.5)
         self.play(Write(final_title))
         self.wait(1)
         
-        # Create axes
         axes = Axes(
             x_range=[0, 4, 1],
             y_range=[0, 12, 2],
@@ -785,13 +772,9 @@ class CalculusIntroScene(Scene):
         )
         axes.shift(DOWN * 0.4)
         
-        # Function y = 2x + 3
         graph = axes.plot(lambda x: 2*x + 3, x_range=[0, 3.5], color=GREEN)
-        
-        # Area for m = 2
         area = axes.get_area(graph, x_range=[0, 2], color=BLUE, opacity=0.4)
         
-        # Labels
         func_label = MathTex("y = 2x + 3", font_size=24, color=GREEN)
         func_label.next_to(axes, UP, buff=0.1)
         
@@ -801,15 +784,12 @@ class CalculusIntroScene(Scene):
         area_label = MathTex("\\text{Area} = 10", font_size=20, color=BLUE)
         area_label.next_to(area, UP, buff=0.2)
         
-        # Vertical line at x = 2
         m_line = DashedLine(axes.c2p(2, 0), axes.c2p(2, 7), color=RED)
         
-        # Store all graph elements
         all_graph_elements = VGroup(
             axes, graph, area, func_label, m_label, area_label, m_line, final_title
         )
         
-        # Create all elements
         self.play(Create(axes))
         self.play(Create(graph))
         self.play(Write(func_label))
@@ -821,7 +801,6 @@ class CalculusIntroScene(Scene):
         self.play(Write(area_label))
         self.wait(2)
         
-        # Show the integral calculation
         calculation = MathTex(
             "\\int_0^2 (2x + 3) dx = [x^2 + 3x]_0^2 = (4 + 6) - 0 = 10",
             font_size=28,
@@ -831,25 +810,23 @@ class CalculusIntroScene(Scene):
         self.play(Write(calculation))
         self.wait(3)
         
-        # FadeOut
-        self.play(FadeOut(all_graph_elements, calculation), run_time=2)
+        self.play(FadeOut(all_graph_elements, calculation, title), run_time=2)
         self.wait(0.5)
-        #------------------------------------------------------------------------------------#
-        #------------------------------------------------------------------------------------#
-        #------------------------------------------------------------------------------------#
-        #------------------------------------------------------------------------------------#
-        # Problem 2
+
+    # ------------------------------------------------------------
+    # PROBLEM 2
+    # ------------------------------------------------------------
+    def problem2(self):
         TITLE_FONT = "Times New Roman"
-        title = Text("Problem 2: Area Calculation", font_size=48, color=BLUE, font = TITLE_FONT)
-        title.to_edge(UP)
-        self.play(Write(title), run_time = 2)
+        title2 = Text("Problem 2: Area Calculation", font_size=48, color=BLUE, font = TITLE_FONT)
+        title2.to_edge(UP)
+        self.play(Write(title2), run_time = 2)
         self.wait(1.5)
         
-        problem = Text("Compute the area of the region (H) using both Integral & Riemann Sum.", font_size=28, color=WHITE).next_to(title, DOWN, buff=0.3)        
+        problem = Text("Compute the area of the region (H) using both Integral & Riemann Sum.", font_size=28, color=WHITE).next_to(title2, DOWN, buff=0.3)        
         self.play(Write(problem), run_time = 4)
         self.wait(1)
         
-        # 1. Setup Axes and Function
         axes = Axes(
             x_range=[-2.5, 2.5, 1],
             y_range=[0, 8, 1],
@@ -861,7 +838,6 @@ class CalculusIntroScene(Scene):
         self.play(Create(axes), Create(labels), run_time=2)
         self.wait(1.5)
 
-        # Function and region
         def func(x):
             return x**2
         
@@ -869,20 +845,14 @@ class CalculusIntroScene(Scene):
         self.play(Create(graph))
         self.wait(0.5)
 
-        # Highlight region H
         region_H = axes.get_area(graph, x_range=[1, 2], color=GREEN, opacity=0.5)
         region_label = MathTex("\\text{Region } H").next_to(axes.c2p(1.5, 2), RIGHT*1.4).scale(0.6)
         
         self.play(FadeIn(region_H), Write(region_label))
         self.wait(3)
 
-
-        # 3. Transition
-        
-        # A. Fade Out Problem
         self.play(FadeOut(problem), run_time=1.5)
         
-        # B. Move the graph
         graph_group = VGroup(axes, labels, graph, region_H, region_label)
         self.play(
             graph_group.animate.to_edge(LEFT, buff=0.5).shift(UP*0.5).scale(1.05),
@@ -890,7 +860,6 @@ class CalculusIntroScene(Scene):
         )
         self.wait(1)
 
-        # Riemann Sum
         riemann_rects = axes.get_riemann_rectangles(
             graph,
             x_range=[1, 2],
@@ -910,7 +879,6 @@ class CalculusIntroScene(Scene):
         self.play(Create(riemann_rects), Write(riemann_text), run_time = 3)
         self.wait(2)
 
-        # Integral calculation
         integral_text = VGroup(
             MathTex("\\text{The exact Area:}"),
             MathTex("A = \\int_1^2 x^2 dx"),
@@ -919,21 +887,14 @@ class CalculusIntroScene(Scene):
             MathTex("A = \\frac{7}{3} \\approx 2.3333")
         ).arrange(DOWN, aligned_edge=LEFT).shift(RIGHT * 3.5).scale(0.7)
         integral_text.shift(DOWN*0.3)
-        self.play(
-            FadeOut(riemann_rects),
-            FadeOut(riemann_text),
-        )
+
+        self.play(FadeOut(riemann_rects), FadeOut(riemann_text))
         self.play(Write(integral_text), run_time = 4)
         self.wait(4)
 
-        # Animation: 
-        self.play(
-            FadeOut(integral_text), 
-            run_time=1.5
-        )
+        self.play(FadeOut(integral_text), run_time=1.5)
         self.wait(2)
 
-       # Summary
         summary_title = Text("Summary:", font_size=36, font=TITLE_FONT, color=RED_C)
         summary_riemann = MathTex("+ \\text{Riemann Sum: } A \\approx 2.185", font_size=36)
         summary_integral = MathTex("+ \\text{Integral: } A = \\frac{7}{3} \\approx 2.3333", font_size=36)
@@ -947,11 +908,8 @@ class CalculusIntroScene(Scene):
         summary.move_to(integral_text.get_center())
         summary.shift(UP*0.5 + RIGHT*0.4)
         
-        # Write Summary
         self.play(Write(summary))
         self.wait(3)
         
-        # Clean finish 
-        all_final_elements = VGroup(summary, title, graph, axes, labels)
-        self.play(FadeOut(all_final_elements), run_time=1.5)
+        self.play(FadeOut(summary, title2, graph, axes, labels), run_time=1.5)
         self.wait(1)
