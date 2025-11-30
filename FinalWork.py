@@ -1,4 +1,4 @@
-# manim -p -r 1920,1080 -q h --fps 120 C:\HCMUT\BTL\Calculus1\Test.py
+# manim -p -r 1920,1080 -q h --fps 120 C:\HCMUT\BTL\Calculus1\FinalWork.py
 from manim import *
 
 class CalculusIntroScene(Scene):
