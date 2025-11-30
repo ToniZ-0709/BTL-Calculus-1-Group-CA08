@@ -124,6 +124,7 @@ class CalculusIntroScene(Scene):
         #------------------------------------------------------------------------------------#
         #------------------------------------------------------------------------------------#
         # Part 1: Title and Basic Formula
+        global title
         title = Text("What is Integration?", font_size = 48, color=BLUE, font=TITLE_FONT)
         title.to_edge(UP)
         self.play(Write(title), run_time = 2)
@@ -195,8 +196,8 @@ class CalculusIntroScene(Scene):
         for item in all_symbols:
             self.play(
                 Write(item[0], run_time=1),
-                FadeIn(item[1], shift=RIGHT, run_time=1.2),
-                run_time = 2
+                FadeIn(item[1], shift=RIGHT, run_time=0.8),
+                run_time = 1.5
             )
             self.wait(1.2)
             
@@ -293,7 +294,7 @@ class CalculusIntroScene(Scene):
         # Formula for xi and delta x
         formula1 = MathTex("x_i = a + i \\cdot \\Delta x", font_size=32, color=WHITE).next_to(text_part3, DOWN, buff=0.5)
         formula2 = MathTex("\\Delta x = \\frac{b - a}{n}", font_size=32, color=WHITE).next_to(formula1, DOWN, buff=0.3)
-        
+
         # Animation
         self.play(Write(text_part1), run_time=3)
         self.wait(1)
@@ -305,7 +306,7 @@ class CalculusIntroScene(Scene):
         self.wait(2)
 
         self.play(Write(formula1), run_time=1.5)
-        self.wait(2)
+        self.wait(1.5)
 
         self.play(Write(formula2), run_time=1.5)
         self.wait(3)
@@ -463,6 +464,7 @@ class CalculusIntroScene(Scene):
             FadeOut(axes),
             FadeOut(graph),
             FadeOut(func_label1),
+            FadeOut(title),
             run_time=2
         )
         #------------------------------------------------------------------------------------#
