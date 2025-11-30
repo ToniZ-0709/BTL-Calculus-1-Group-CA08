@@ -10,7 +10,7 @@ class CalculusIntroScene(Scene):
         GroupName = Text("Group CA08 – CC15", font_size=50, color=WHITE, font=TITLE_FONT)
         SubjectName = Text("Calculus 1", font_size=120, color=BLUE_C, font=TITLE_FONT, weight=BOLD).next_to(GroupName, UP, buff = 0.3)
         GroupIntroduction = VGroup(SubjectName, GroupName)
-        self.play(Write(GroupIntroduction), runtime = 3)
+        self.play(Write(GroupIntroduction), run_time = 3)
         self.wait(2)
         self.play(FadeOut(GroupIntroduction))
         #------------------------------------------------------------------------------------#
@@ -103,7 +103,7 @@ class CalculusIntroScene(Scene):
         self.wait(1)
 
         # Write the Title and Line
-        self.play(Write(Table), Create(line), runtime = 1.5)
+        self.play(Write(Table), Create(line), run_time = 1.5)
         self.wait(0.8)
         
         # Write the List Items sequentially
@@ -126,12 +126,12 @@ class CalculusIntroScene(Scene):
         # Part 1: Title and Basic Formula
         title = Text("What is Integration?", font_size = 48, color=BLUE, font=TITLE_FONT)
         title.to_edge(UP)
-        self.play(Write(title), runtime = 2)
+        self.play(Write(title), run_time = 2)
         self.wait(1.5)
 
         formula = MathTex("\\int_{a}^{b} f(x) dx = F(b) - F(a)", font_size = 36)
         formula.next_to(title, DOWN, buff=0.5)
-        self.play(Write(formula), runtime = 1.5)
+        self.play(Write(formula), run_time = 1.5)
         self.wait(1.5)
 
         # Clear for next part
@@ -189,14 +189,14 @@ class CalculusIntroScene(Scene):
 
         # --- ANIMATION ---
         symbols_title.shift(UP * 0.8)
-        self.play(Write(symbols_title), runtime = 1.5)
+        self.play(Write(symbols_title), run_time = 1.5)
         self.wait(0.5)
         
         for item in all_symbols:
             self.play(
                 Write(item[0], run_time=1),
                 FadeIn(item[1], shift=RIGHT, run_time=1.2),
-                runtime = 2
+                run_time = 2
             )
             self.wait(1.2)
             
@@ -210,7 +210,7 @@ class CalculusIntroScene(Scene):
         # Part 3: Meaning
         meaning_title = Text("Meaning of Integration", font_size=48, color=BLUE, font=TITLE_FONT)
         meaning_title.to_edge(UP)
-        self.play(Write(meaning_title), runtime = 1.5)
+        self.play(Write(meaning_title), run_time = 1.5)
 
         meanings = VGroup(
             Text("• Sum of small changes", font_size=32),
@@ -222,7 +222,7 @@ class CalculusIntroScene(Scene):
         meanings.next_to(meaning_title, DOWN, buff=0.5)
         
         for meaning in meanings:
-            self.play(Write(meaning), runtime = 1.5)
+            self.play(Write(meaning), run_time = 1.5)
             self.wait(1)
 
         self.wait(2)
@@ -243,9 +243,9 @@ class CalculusIntroScene(Scene):
         a, b = 1, 2
         area = axes.get_area(graph, x_range=[a, b], color=BLUE, opacity=0.5)
         
-        self.play(Create(axes), Create(graph), runtime = 1)
+        self.play(Create(axes), Create(graph), run_time = 1)
         self.wait(1)
-        self.play(Create(area), runtime = 1)
+        self.play(Create(area), run_time = 1)
         self.wait(2)
 
         # Add labels for a and b
@@ -258,10 +258,10 @@ class CalculusIntroScene(Scene):
         area_label = Text("The area under the curve = Integration", font = TITLE_FONT, font_size=24, color=WHITE)
         area_label.next_to(axes, DOWN * 0.8, buff=0.4)
         
-        self.play(Write(a_label), Write(b_label), Write(function_label), Write(area_label), runtime = 1.5)
+        self.play(Write(a_label), Write(b_label), Write(function_label), Write(area_label), run_time = 1.5)
         self.wait(3)
         ABCABC = VGroup(a_label, b_label, function_label, area_label, axes, graph, area)
-        self.play(FadeOut(ABCABC), runtime = 1)
+        self.play(FadeOut(ABCABC), run_time = 1)
         #------------------------------------------------------------------------------------#
         #------------------------------------------------------------------------------------#
         #------------------------------------------------------------------------------------#
@@ -271,19 +271,47 @@ class CalculusIntroScene(Scene):
         title.to_edge(UP)
         self.play(Write(title), run_time=2)
         self.wait(1.5) 
+
+        text_part1 = MathTex(
+            "\\text{Let } f(x) \\text{ be a function defined on the closed interval } [a, b] \\text{ with } a < b.",
+            font_size=32,
+            color=WHITE
+        ).next_to(title, DOWN, buff=0.5)
         
+        text_part2 = MathTex(
+            "\\text{We subdivide the interval } [a, b] \\text{ into } n \\text{ equal sub-intervals: }",
+            font_size=32,
+            color=WHITE
+        ).next_to(text_part1, DOWN, buff=0.3)
+
+        text_part3 = MathTex(
+            "x_0 < x_1 < x_2 < \\dots < x_n = b",
+            font_size=32,
+            color=WHITE
+        ).next_to(text_part2, DOWN, buff=0.3)
+
         # Formula for xi and delta x
-        formulas = VGroup(
-            MathTex("x_i = a + i \\cdot \\Delta x"),
-            MathTex("\\Delta x = \\frac{b - a}{n}")
-        ).arrange(DOWN, aligned_edge=LEFT, buff=0.3)
+        formula1 = MathTex("x_i = a + i \\cdot \\Delta x", font_size=32, color=WHITE).next_to(text_part3, DOWN, buff=0.5)
+        formula2 = MathTex("\\Delta x = \\frac{b - a}{n}", font_size=32, color=WHITE).next_to(formula1, DOWN, buff=0.3)
         
-        formulas.next_to(title, DOWN, buff=0.8)
-        self.play(Write(formulas), run_time=3.5)
-        self.wait(4)
+        # Animation
+        self.play(Write(text_part1), run_time=3)
+        self.wait(1)
+                
+        self.play(Write(text_part2), run_time=3)
+        self.wait(2)
         
-        # Clear for visualization
-        self.play(FadeOut(title), FadeOut(formulas), run_time=2)
+        self.play(Write(text_part3), run_time=3)
+        self.wait(2)
+
+        self.play(Write(formula1), run_time=1.5)
+        self.wait(2)
+
+        self.play(Write(formula2), run_time=1.5)
+        self.wait(3)
+
+        elements = VGroup(text_part1, text_part2, text_part3, formula1, formula2)
+        self.play(FadeOut(elements))
         
         # Create axes and function f(x) = x^3 - 3x + 5, shift to left - Đã tăng run_time từ 1s lên 2.5s
         axes = Axes(
@@ -445,13 +473,13 @@ class CalculusIntroScene(Scene):
         TITLE_FONT = "Times New Roman"
         title = Text("Fundamental Theorem of Calculus", font_size=48, color=BLUE, font=TITLE_FONT)
         title.to_edge(UP)
-        self.play(Write(title), runtime = 2)
+        self.play(Write(title), run_time = 2)
         self.wait(1.5)
 
         # Part 1: Derivative of the Integral
         part1_title = Text("Part 1: Derivative of the Integral", font_size=36, color=YELLOW, font=TITLE_FONT)
         part1_title.next_to(title, DOWN, buff=0.5)
-        self.play(Write(part1_title), runtime = 1.5)
+        self.play(Write(part1_title), run_time = 1.5)
         self.wait(1.5)
 
         # FTC Part 1 formula
@@ -461,7 +489,7 @@ class CalculusIntroScene(Scene):
             color=GREEN
         )
         ftc1_formula.next_to(part1_title, DOWN, buff=0.8)
-        self.play(Write(ftc1_formula), runtime = 1.5)
+        self.play(Write(ftc1_formula), run_time = 1.5)
         self.wait(2)
 
         # Explanation of Part 1
@@ -489,7 +517,7 @@ class CalculusIntroScene(Scene):
         # Part 2: Evaluation of Definite Integrals
         part2_title = Text("Part 2: Evaluation using Antiderivative", font_size=36, color=ORANGE, font=TITLE_FONT)
         part2_title.next_to(title, DOWN, buff=0.5)
-        self.play(Write(part2_title), runtime = 1.5)
+        self.play(Write(part2_title), run_time = 1.5)
         self.wait(1.5)
 
         # FTC Part 2 formula
@@ -499,7 +527,7 @@ class CalculusIntroScene(Scene):
             color=GREEN
         )
         ftc2_formula.next_to(part2_title, DOWN, buff=0.8)
-        self.play(Write(ftc2_formula), runtime = 1.5)
+        self.play(Write(ftc2_formula), run_time = 1.5)
         self.wait(2)
 
         # Where F is antiderivative
@@ -542,7 +570,7 @@ class CalculusIntroScene(Scene):
         # 1. Example Title
         example_title = Text("Example: Compute ∫(2x) dx from 1 to 3", font_size=36, color=PURPLE, font="Times New Roman")
         example_title.next_to(main_title, DOWN, buff=0.5)
-        self.play(Write(example_title), runtime = 1.5)
+        self.play(Write(example_title), run_time = 1.5)
         self.wait(1.5)
 
         # 2. Step by step solution
@@ -556,7 +584,7 @@ class CalculusIntroScene(Scene):
         steps.next_to(example_title, DOWN, buff=0.8)
 
         for step in steps:
-            self.play(Write(step), runtime = 1.8)
+            self.play(Write(step), run_time = 1.8)
             self.wait(1.5)
 
         self.wait(3)
@@ -611,7 +639,7 @@ class CalculusIntroScene(Scene):
             Create(axes),
             Create(graph),
             Write(func_label),
-            runtime = 3
+            run_time = 3
         )
         self.wait(0.5)
 
@@ -639,7 +667,7 @@ class CalculusIntroScene(Scene):
         # Summary
         summary_title = Text("Summary of FTC:", font_size=36, color=GREEN, font="Times New Roman")
         summary_title.next_to(main_title, DOWN, buff=0.5)
-        self.play(Write(summary_title), runtime = 1.5)
+        self.play(Write(summary_title), run_time = 1.5)
         self.wait(1.5)
 
         summary = VGroup(
@@ -648,7 +676,7 @@ class CalculusIntroScene(Scene):
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.3)
         summary.next_to(summary_title, DOWN, buff=1.0) 
 
-        self.play(Write(summary), runtime = 4)
+        self.play(Write(summary), run_time = 4)
         self.wait(3)
 
         # FadeOut
@@ -668,7 +696,7 @@ class CalculusIntroScene(Scene):
         TITLE_FONT = "Times New Roman"
         title = Text("Problem 1: Find the Value of m", font_size=48, color=BLUE, font = TITLE_FONT)
         title.to_edge(UP)
-        self.play(Write(title), runtime = 2)
+        self.play(Write(title), run_time = 2)
         self.wait(1.5)
         
         # Problem statement
@@ -679,7 +707,7 @@ class CalculusIntroScene(Scene):
         
         problem.next_to(title, DOWN, buff=0.5)
         problem.shift(RIGHT*0.1)
-        self.play(Write(problem), runtime = 4)
+        self.play(Write(problem), run_time = 4)
         self.wait(4)
         
         # Clear for solution
@@ -705,13 +733,13 @@ class CalculusIntroScene(Scene):
         # Step 2: Find antiderivative
         step2 = MathTex("F(x) = x^2 + 3x", font_size=36)
         step2.next_to(step1, DOWN, buff=0.5)
-        self.play(Write(step2), runtime = 2)
+        self.play(Write(step2), run_time = 2)
         self.wait(2)
         
         # Step 3: Apply FTC
         step3 = MathTex("\\Rightarrow F(m) - F(0) = m^2 + 3m", font_size=36)
         step3.next_to(step2, DOWN, buff=0.5)
-        self.play(Write(step3), runtime = 2)
+        self.play(Write(step3), run_time = 2)
         self.wait(2)
         
         # Step 4: Set up equation
@@ -729,7 +757,7 @@ class CalculusIntroScene(Scene):
         # Step 8: Select positive solution
         step8 = MathTex("m > 0 \\Rightarrow m = 2", font_size=36, color=GREEN)
         step8.next_to(step7, DOWN, buff=0.5)
-        self.play(Write(step8), runtime = 2)
+        self.play(Write(step8), run_time = 2)
         self.wait(2)
         
         # Store steps for later fade out
