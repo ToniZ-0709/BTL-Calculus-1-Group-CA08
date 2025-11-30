@@ -801,6 +801,6 @@ class CalculusIntroScene(Scene):
         self.play(Write(calculation))
         self.wait(3)
         
-        # THÊM FADEOUT cho TẤT CẢ các đối tượng còn lại
+        # FadeOut
         self.play(FadeOut(all_graph_elements, calculation), run_time=2)
         self.wait(0.5)
