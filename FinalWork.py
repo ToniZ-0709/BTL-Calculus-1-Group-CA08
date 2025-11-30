@@ -535,3 +535,127 @@ class CalculusIntroScene(Scene):
             FadeOut(where_F),
             FadeOut(explanation2)
         )
+
+        # Example
+        self.show_example(title)
+    def show_example(self, main_title):
+        # 1. Example Title
+        example_title = Text("Example: Compute ∫(2x) dx from 1 to 3", font_size=36, color=PURPLE, font="Times New Roman")
+        example_title.next_to(main_title, DOWN, buff=0.5)
+        self.play(Write(example_title), runtime = 1.5)
+        self.wait(1.5)
+
+        # 2. Step by step solution
+        steps = VGroup(
+            MathTex("\\text{1. Find antiderivative: } F(x) = x^2 + C", font_size=28),
+            MathTex("\\text{2. Apply FTC: } \\int_1^3 2x dx = F(3) - F(1)", font_size=28),
+            MathTex("\\text{3. Evaluate: } F(3) - F(1) = (3^2) - (1^2)", font_size=28),
+            MathTex("\\text{4. Compute: } (3^2) - (1^2) = 9 - 1 = 8", font_size=28)
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.3)
+
+        steps.next_to(example_title, DOWN, buff=0.8)
+
+        for step in steps:
+            self.play(Write(step), runtime = 1.8)
+            self.wait(1.5)
+
+        self.wait(3)
+
+        # 3. Visual demonstration
+        self.show_visual_demonstration(main_title, example_title, steps)
+
+    def show_visual_demonstration(self, main_title, example_title, steps):
+        # Clear steps for visualization
+        self.play(FadeOut(steps))
+
+        # Create axes
+        axes = Axes(
+            x_range=[0, 4, 1],
+            y_range=[0, 8, 1],
+            x_length=6,
+            y_length=4,
+            axis_config={"color": WHITE}
+        )
+        axes.shift(DOWN * 0.5)
+
+        # Function f(x) = 2x
+        graph = axes.plot(lambda x: 2*x, x_range=[0, 3.5], color=GREEN)
+        
+        # Area under curve from 1 to 3
+        area = axes.get_area(graph, x_range=[1, 3], color=BLUE, opacity=0.4)
+
+        # Labels
+        func_label = MathTex("f(x) = 2x", font_size=24, color=GREEN)
+        func_label.next_to(axes, UP, buff=0.1)
+
+        area_label = MathTex("\\text{Area} = 8", font_size=24, color=BLUE)
+        area_label.next_to(area, UP, buff=0.2)
+
+        # Vertical lines at x=1 and x=3
+        line1 = DashedLine(axes.c2p(1, 0), axes.c2p(1, 6), color=RED)
+        line3 = DashedLine(axes.c2p(3, 0), axes.c2p(3, 6), color=RED)
+
+        x1_label = MathTex("x=1", font_size=20, color=RED).next_to(axes.c2p(1, 0), DOWN)
+        x3_label = MathTex("x=3", font_size=20, color=RED).next_to(axes.c2p(3, 0), DOWN)
+
+        # Connection formula
+        ftc_connection = MathTex(
+            "\\int_1^3 2x dx = 3^2 - 1^2 = 8",
+            font_size=30,
+            color=GREEN
+        )
+        ftc_connection.next_to(axes, DOWN * 0.5, buff=0.8)
+        
+        # Presentation of graph
+        self.play(
+            Create(axes),
+            Create(graph),
+            Write(func_label),
+            runtime = 3
+        )
+        self.wait(0.5)
+
+        self.play(
+            Create(line1),
+            Create(line3),
+            Write(x1_label),
+            Write(x3_label)
+        )
+        self.wait(1)
+
+        self.play(FadeIn(area), Write(area_label))
+        self.wait(2)
+
+        self.play(Write(ftc_connection))
+        self.wait(2)
+                
+        # FadeOut 
+        graph_elements = VGroup(
+            axes, graph, area, func_label, area_label, line1, line3, x1_label, x3_label, ftc_connection, example_title
+        )
+        self.play(FadeOut(graph_elements), run_time=2)
+        self.wait(0.5)
+
+        # Summary
+        summary_title = Text("Summary of FTC:", font_size=36, color=GREEN, font="Times New Roman")
+        summary_title.next_to(main_title, DOWN, buff=0.5)
+        self.play(Write(summary_title), runtime = 1.5)
+        self.wait(1.5)
+
+        summary = VGroup(
+            MathTex("\\text{FTC Part 1: } \\frac{d}{dx} \\int_a^x f(t) dt = f(x)", font_size=24),
+            MathTex("\\text{FTC Part 2: } \\int_a^b f(x) dx = F(b) - F(a)", font_size=24)
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.3)
+        summary.next_to(summary_title, DOWN, buff=1.0) 
+
+        self.play(Write(summary), runtime = 4)
+        self.wait(3)
+
+        # FadeOut
+        self.play(
+            FadeOut(main_title),
+            FadeOut(summary_title),
+            FadeOut(summary),
+            run_time=1.5
+        )
+        self.wait(0.5)
