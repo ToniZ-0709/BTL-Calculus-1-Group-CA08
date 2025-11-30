@@ -834,3 +834,124 @@ class CalculusIntroScene(Scene):
         # FadeOut
         self.play(FadeOut(all_graph_elements, calculation), run_time=2)
         self.wait(0.5)
+        #------------------------------------------------------------------------------------#
+        #------------------------------------------------------------------------------------#
+        #------------------------------------------------------------------------------------#
+        #------------------------------------------------------------------------------------#
+        # Problem 2
+        TITLE_FONT = "Times New Roman"
+        title = Text("Problem 2: Area Calculation", font_size=48, color=BLUE, font = TITLE_FONT)
+        title.to_edge(UP)
+        self.play(Write(title), run_time = 2)
+        self.wait(1.5)
+        
+        problem = Text("Compute the area of the region (H) using both Integral & Riemann Sum.", font_size=28, color=WHITE).next_to(title, DOWN, buff=0.3)        
+        self.play(Write(problem), run_time = 4)
+        self.wait(1)
+        
+        # 1. Setup Axes and Function
+        axes = Axes(
+            x_range=[-2.5, 2.5, 1],
+            y_range=[0, 8, 1],
+            x_length=7.5,
+            y_length=7.5,
+        ).shift(DOWN).scale(0.7)
+        
+        labels = axes.get_axis_labels(x_label="x", y_label="y")
+        self.play(Create(axes), Create(labels), run_time=2)
+        self.wait(1.5)
+
+        # Function and region
+        def func(x):
+            return x**2
+        
+        graph = axes.plot(func, x_range=[-2.5, 2.5], color=BLUE)        
+        self.play(Create(graph))
+        self.wait(0.5)
+
+        # Highlight region H
+        region_H = axes.get_area(graph, x_range=[1, 2], color=GREEN, opacity=0.5)
+        region_label = MathTex("\\text{Region } H").next_to(axes.c2p(1.5, 2), RIGHT*1.4).scale(0.6)
+        
+        self.play(FadeIn(region_H), Write(region_label))
+        self.wait(3)
+
+
+        # 3. Transition
+        
+        # A. Fade Out Problem
+        self.play(FadeOut(problem), run_time=1.5)
+        
+        # B. Move the graph
+        graph_group = VGroup(axes, labels, graph, region_H, region_label)
+        self.play(
+            graph_group.animate.to_edge(LEFT, buff=0.5).shift(UP*0.5).scale(1.05),
+            run_time=1.5
+        )
+        self.wait(1)
+
+        # Riemann Sum
+        riemann_rects = axes.get_riemann_rectangles(
+            graph,
+            x_range=[1, 2],
+            dx=0.1,
+            input_sample_type="right",
+            color=RED,
+            fill_opacity=0.6
+        )
+
+        riemann_text = VGroup(
+            MathTex("\\text{Riemann Sum (n=10):}"),
+            MathTex("\\Delta x = 0.1"),
+            MathTex("A \\approx 2.185")
+        ).arrange(DOWN, aligned_edge=LEFT).shift(RIGHT * 3.5 + UP*1.2).scale(0.7)
+        
+        self.play(FadeOut(region_H), FadeOut(region_label))
+        self.play(Create(riemann_rects), Write(riemann_text), run_time = 3)
+        self.wait(2)
+
+        # Integral calculation
+        integral_text = VGroup(
+            MathTex("\\text{The exact Area:}"),
+            MathTex("A = \\int_1^2 x^2 dx"),
+            MathTex("A = \\left[\\frac{x^3}{3}\\right]_1^2"),
+            MathTex("A = \\frac{8}{3} - \\frac{1}{3}"),
+            MathTex("A = \\frac{7}{3} \\approx 2.3333")
+        ).arrange(DOWN, aligned_edge=LEFT).shift(RIGHT * 3.5).scale(0.7)
+        integral_text.shift(DOWN*0.3)
+        self.play(
+            FadeOut(riemann_rects),
+            FadeOut(riemann_text),
+        )
+        self.play(Write(integral_text), run_time = 4)
+        self.wait(4)
+
+        # Animation: 
+        self.play(
+            FadeOut(integral_text), 
+            run_time=1.5
+        )
+        self.wait(2)
+
+       # Summary
+        summary_title = Text("Summary:", font_size=36, font=TITLE_FONT, color=RED_C)
+        summary_riemann = MathTex("+ \\text{Riemann Sum: } A \\approx 2.185", font_size=36)
+        summary_integral = MathTex("+ \\text{Integral: } A = \\frac{7}{3} \\approx 2.3333", font_size=36)
+        
+        summary = VGroup(
+            summary_title,
+            summary_riemann,
+            summary_integral
+        ).arrange(DOWN, aligned_edge=LEFT, buff=0.3).scale(0.8) 
+        
+        summary.move_to(integral_text.get_center())
+        summary.shift(UP*0.5 + RIGHT*0.4)
+        
+        # Write Summary
+        self.play(Write(summary))
+        self.wait(3)
+        
+        # Clean finish 
+        all_final_elements = VGroup(summary, title, graph, axes, labels)
+        self.play(FadeOut(all_final_elements), run_time=1.5)
+        self.wait(1)
