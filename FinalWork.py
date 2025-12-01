@@ -918,7 +918,28 @@ class CalculusIntroScene(Scene):
         #------------------------------------------------------------------------------------#
         #------------------------------------------------------------------------------------#
         self.GeometricMeaning()
-
+    def create_simple_intro_graph(self):
+        axes = Axes(
+            x_range=[-1, 5, 1],
+            y_range=[-1, 6, 1],
+            x_length=5,
+            y_length=4,
+            axis_config={"color": WHITE, "include_numbers": False, "stroke_width": 1}
+        )
+        
+        def simple_func(x):
+            return (x - 2) * (x + 1) * 0.5 + 2 
+            
+        graph = axes.plot(simple_func, x_range=[0, 4], color=YELLOW)
+        
+        # Area 
+        area = axes.get_area(graph, x_range=[0.5, 3.5], color=RED_B, opacity=0.4)
+        
+        x_label = axes.get_x_axis_label(MathTex("x")).shift(RIGHT * 0.1)
+        y_label = axes.get_y_axis_label(MathTex("y")).shift(UP * 0.1)
+        
+        return VGroup(axes, graph, area, x_label, y_label).scale(0.7)
+    
     def GeometricMeaning(self):
         TITLE_FONT = "Times New Roman"
                 
@@ -1125,24 +1146,3 @@ class CalculusIntroScene(Scene):
         )
         self.wait(1)
 
-    def create_simple_intro_graph(self):
-        axes = Axes(
-            x_range=[-1, 5, 1],
-            y_range=[-1, 6, 1],
-            x_length=5,
-            y_length=4,
-            axis_config={"color": WHITE, "include_numbers": False, "stroke_width": 1}
-        )
-        
-        def simple_func(x):
-            return (x - 2) * (x + 1) * 0.5 + 2 
-            
-        graph = axes.plot(simple_func, x_range=[0, 4], color=YELLOW)
-        
-        # Area 
-        area = axes.get_area(graph, x_range=[0.5, 3.5], color=RED_B, opacity=0.4)
-        
-        x_label = axes.get_x_axis_label(MathTex("x")).shift(RIGHT * 0.1)
-        y_label = axes.get_y_axis_label(MathTex("y")).shift(UP * 0.1)
-        
-        return VGroup(axes, graph, area, x_label, y_label).scale(0.7)
