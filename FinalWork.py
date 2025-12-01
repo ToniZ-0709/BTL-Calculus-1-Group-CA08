@@ -913,3 +913,236 @@ class CalculusIntroScene(Scene):
         
         self.play(FadeOut(summary, title2, graph, axes, labels), run_time=1.5)
         self.wait(1)
+        #------------------------------------------------------------------------------------#
+        #------------------------------------------------------------------------------------#
+        #------------------------------------------------------------------------------------#
+        #------------------------------------------------------------------------------------#
+        self.GeometricMeaning()
+
+    def GeometricMeaning(self):
+        TITLE_FONT = "Times New Roman"
+                
+        # 1. Title and subtitle1 Setup 
+        title = Text("Geometric Meaning", font_size=48, color=BLUE, font = TITLE_FONT)
+        title.to_edge(UP, buff=0.2)
+        subtitle1 = Text("Area under a single curve", font_size=36, color=YELLOW, font=TITLE_FONT)
+        subtitle1.next_to(title, DOWN, buff=0.3)
+        target_pos = title.get_center()
+
+        # 1.1 Play title & subtitle1
+        self.play(Write(title), run_time = 2)
+        self.wait(1.5)
+        self.play(Write(subtitle1, run_time=1.5))
+        self.wait(0.1)
+
+        # 1.2 Move subtitle1 
+        self.play(
+            title.animate.shift(UP * 0.2).set_opacity(0), 
+            run_time=1.0
+        )
+        
+        # 1.3 Move subtitle1 & Fade Out Title 
+        self.play(
+            subtitle1.animate.move_to(target_pos).set_color(YELLOW).scale(48/36), 
+            run_time=1.0
+        )
+        self.wait(1.5) 
+        
+        current_subtitle1 = subtitle1.copy()
+        #------------------------------------------------------------------------------------#        
+
+        text_part1 = Text(
+            "The definite integral represents the net signed area",
+            font_size=32,
+            color=WHITE
+        ).next_to(current_subtitle1, DOWN, buff=0.3)
+        
+        text_part2 = Text(
+            "between the function's graph and the x-axis.",
+            font_size=32,
+            color=WHITE
+        ).next_to(text_part1, DOWN, buff=0.3)
+
+        # Animation
+        self.play(Write(text_part1), run_time=2)
+        self.play(Write(text_part2), run_time=2)
+        self.wait(2)
+        
+        # Graph
+        intro_graph_group = (self.create_simple_intro_graph()).scale(1.2)
+        intro_graph_group.next_to(text_part2, DOWN, buff=0.6)
+        
+        self.play(Write(intro_graph_group), run_time=2)
+        self.wait(3.5)
+
+
+        # FadeOut 
+        self.play(
+            FadeOut(text_part1),
+            FadeOut(text_part2),
+            FadeOut(current_subtitle1),
+            FadeOut(intro_graph_group),
+            FadeOut(subtitle1), 
+            run_time=1.5
+        ) 
+        
+        
+        # 3. SETUP GRAPHS (Define Functions and Axes Creator)
+        
+        def create_axes(x_range, y_range):
+            axes = Axes(
+                x_range=x_range,
+                y_range=y_range,
+                x_length=7,
+                y_length=4,
+                axis_config={"color": WHITE, "include_numbers": False, "stroke_width": 1.5},
+            ).center().shift(DOWN*0.3)
+            labels = axes.get_axis_labels(x_label="x", y_label="y")
+            return VGroup(axes, labels)
+
+        # 3.2. Define Functions
+        def func_pos(x): 
+            return x**2 + 1
+        
+        def func_signed(x):
+            return x**3 - 6*x**2 + 8*x
+        
+        # --- Case 1: Positive Area ---
+        a_c1, b_c1 = 1, 3
+        
+        axes_group1 = create_axes([0, 4, 1], [0, 10, 1])
+        graph1 = axes_group1[0].plot(func_pos, x_range=[0, 3.5], color=GREEN)
+        area1 = axes_group1[0].get_area(graph1, x_range=[a_c1, b_c1], color=BLUE_C, opacity=0.6)
+        
+        # Text Case 1
+        text_case1 = Text("Case 1: Positive Area (A > 0)", font_size=32, color=WHITE, font=TITLE_FONT).to_edge(UP, buff=0.2)
+        text_case1_formula = MathTex("\\text{If } f(x) \\ge 0 \\text{ on } [a, b]", font_size=36, color=WHITE).next_to(text_case1, DOWN, buff=0.3)
+        text_area1 = MathTex("\\text{Area} = \\int_a^b f(x) dx", font_size=36, color=YELLOW).next_to(axes_group1, DOWN, buff=0.4)
+        
+        a_label1 = MathTex("a", font_size=30, color=RED).next_to(axes_group1[0].c2p(a_c1, 0), DOWN)
+        b_label1 = MathTex("b", font_size=30, color=RED).next_to(axes_group1[0].c2p(b_c1, 0), DOWN)
+
+        group1 = VGroup(axes_group1, graph1, area1, text_area1, text_case1_formula, text_case1, a_label1, b_label1)
+
+        # SHOW Case 1
+        self.play(Write(group1), run_time=4.5) 
+        self.wait(5)
+        
+        # --- Case 2: Net Signed Area (A1 - A2) - Smooth Transition ---
+        a_c2, b_c2, x_zero = 1, 4, 2 
+        
+        axes_group2 = create_axes([0, 4.5, 1], [-3, 5, 1])
+        graph2 = axes_group2[0].plot(func_signed, x_range=[0, 4.1], color=GREEN_C)
+        
+
+        area2_pos = axes_group2[0].get_area(graph2, x_range=[a_c2, x_zero], color=BLUE_A, opacity=0.6)
+        A1_label = MathTex("A_1 (+)", font_size=30, color=BLUE_A).move_to(axes_group2[0].c2p(1.3, 1.3))
+        
+
+        area2_neg = axes_group2[0].get_area(graph2, x_range=[x_zero, b_c2], color=RED_A, opacity=0.6)
+        A2_label = MathTex("A_2 (-)", font_size=30, color=RED_A).move_to(axes_group2[0].c2p(3, -1.5))
+        
+        text_area2_formula = MathTex(
+            "\\int_a^b f(x) dx = A_1 - A_2 \\quad (\\text{Net Signed Area})", 
+            font_size=36, 
+            color=BLUE
+        ).next_to(axes_group2, DOWN, buff=0.4)
+        text_title2 = Text("Case 2: Net Signed Area", font_size=32, color=WHITE, font=TITLE_FONT).to_edge(UP, buff=0.2)
+        text_case2_condition = MathTex("\\text{If } f(x) \\text{ changes sign on } [a, b]", font_size=36, color=WHITE).next_to(text_title2, DOWN, buff=0.3)
+        text_title2_group = VGroup(text_title2, text_case2_condition) # Nhóm lại để căn chỉnh        
+
+        a_label2 = MathTex("a", font_size=30, color=RED).next_to(axes_group2[0].c2p(a_c2, 0), DOWN)
+        b_label2 = MathTex("b", font_size=30, color=RED).next_to(axes_group2[0].c2p(b_c2, 0), DOWN)
+        
+        group2 = VGroup(axes_group2, graph2, area2_pos, area2_neg, text_area2_formula, text_title2_group, A1_label, A2_label, a_label2, b_label2)
+
+        # Transition Case 1 -> Case 2
+        self.play(Transform(group1, group2), run_time=2.5)
+        self.wait(5)
+        
+        
+        # 1. Fade Out Case 2
+        self.play(FadeOut(group1), run_time=1.5)
+        
+        # 2. Conclusion
+        
+        axes_group3 = create_axes([0, 4.5, 1], [-3, 5, 1])
+        graph3 = axes_group3[0].plot(func_signed, x_range=[0, 4.1], color=GREEN_C)
+        
+        def func_abs_py(x): 
+            return abs(func_signed(x))
+            
+        graph_abs = axes_group3[0].plot(func_abs_py, x_range=[x_zero, b_c2 + 0.1], color=ORANGE) 
+        
+        area3_pos = axes_group3[0].get_area(graph3, x_range=[a_c2, x_zero], color=BLUE_A, opacity=0.6)
+        
+        area3_abs = axes_group3[0].get_area(graph_abs, x_range=[x_zero, b_c2], color=ORANGE, opacity=0.6)
+
+        A1_label_abs = MathTex("|A_1|", font_size=30, color=BLUE_A).move_to(axes_group3[0].c2p(1.2, 1.5))
+        A2_label_abs = MathTex("|A_2|", font_size=30, color=ORANGE).move_to(axes_group3[0].c2p(3, 1.5)) 
+        
+        zero_point = Dot(axes_group3[0].c2p(x_zero, 0), color=RED, radius=0.08)
+        zero_label = MathTex("f(x)=0", font_size=20, color=WHITE).next_to(zero_point, UP, buff=0.5)
+
+        # Total Area 
+        text_conclusion_formula = MathTex(
+            "\\text{Total Area} = \\int_a^b |f(x)| dx = |A_1| + |A_2|", 
+            font_size=36, 
+            color=ORANGE
+        ).next_to(axes_group3, DOWN, buff=0.4)
+        
+        # Title Case 3/Conclusion
+        text_title3 = Text("Conclusion: How to compute the total geometric area?", font_size=32, color=WHITE, font=TITLE_FONT).to_edge(UP, buff=0.2)
+        
+        a_label3 = MathTex("a", font_size=30, color=RED).next_to(axes_group3[0].c2p(a_c2, 0), DOWN)
+        b_label3 = MathTex("b", font_size=30, color=RED).next_to(axes_group3[0].c2p(b_c2, 0), DOWN)
+        
+        group3_conclusion = VGroup(
+            axes_group3, graph3, graph_abs, area3_pos, area3_abs, 
+            text_conclusion_formula, text_title3, A1_label_abs, A2_label_abs, 
+            a_label3, b_label3, zero_point, zero_label
+        )
+        
+        # 3. SHOW Conclusion 
+        self.play(Write(group3_conclusion), run_time=5)
+        self.wait(6)
+
+        # 4. Final Summary 
+        integral_part = MathTex("\\int_a^b |f(x)| dx = |A_1| + |A_2| + ...", font_size=60, color=GOLD).center()
+        
+        self.play(
+            FadeOut(VGroup(axes_group3, graph3, graph_abs, area3_pos, area3_abs, A1_label_abs, A2_label_abs, a_label3, b_label3, zero_point, zero_label)),
+            Transform(text_conclusion_formula, integral_part), 
+            run_time=2.5
+        )
+        self.wait(4)
+        
+        # 5. Final FadeOut
+        self.play(
+            FadeOut(text_title3),
+            FadeOut(text_conclusion_formula),
+            run_time=1.5
+        )
+        self.wait(1)
+
+    def create_simple_intro_graph(self):
+        axes = Axes(
+            x_range=[-1, 5, 1],
+            y_range=[-1, 6, 1],
+            x_length=5,
+            y_length=4,
+            axis_config={"color": WHITE, "include_numbers": False, "stroke_width": 1}
+        )
+        
+        def simple_func(x):
+            return (x - 2) * (x + 1) * 0.5 + 2 
+            
+        graph = axes.plot(simple_func, x_range=[0, 4], color=YELLOW)
+        
+        # Area 
+        area = axes.get_area(graph, x_range=[0.5, 3.5], color=RED_B, opacity=0.4)
+        
+        x_label = axes.get_x_axis_label(MathTex("x")).shift(RIGHT * 0.1)
+        y_label = axes.get_y_axis_label(MathTex("y")).shift(UP * 0.1)
+        
+        return VGroup(axes, graph, area, x_label, y_label).scale(0.7)
