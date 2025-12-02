@@ -800,6 +800,19 @@ class CalculusIntroScene(Scene):
         #------------------------------------------------------------------------------------#
         #------------------------------------------------------------------------------------#
         self.GeometricMeaning()
+        
+    def create_axes(self, x_range, y_range):
+        # Helper method for creating axes (Promoted from old GeometricMeaning scope)
+        axes = Axes(
+            x_range=x_range,
+            y_range=y_range,
+            x_length=7,
+            y_length=5,
+            axis_config={"color": WHITE, "include_numbers": False, "stroke_width": 1.5}
+        ).center().shift(UP * 0.5)
+        labels = axes.get_axis_labels(x_label="x", y_label="y")
+        return VGroup(axes, labels)
+    
     def create_simple_intro_graph(self):
         axes = Axes(
             x_range=[-1, 5, 1],
@@ -1027,4 +1040,152 @@ class CalculusIntroScene(Scene):
             run_time=1.5
         )
         self.wait(1)
+
+        # --- DEFINITIONS FOR INTERSECTION AREA ---
+        
+        # Shift amount to move the region entirely to the positive x-axis
+        H_SHIFT = 3 
+        
+        # Original Intersection Points: x = sqrt(3) and x = -sqrt(3)
+        a_orig = -np.sqrt(3)
+        b_orig = np.sqrt(3)
+
+        # New Intersection Points (shifted right by H_SHIFT):
+        a = a_orig + H_SHIFT  # a approx 1.268
+        b = b_orig + H_SHIFT  # b approx 4.732
+        
+        # New Non-linear Functions (Shifted: x -> x - H_SHIFT)
+        def func_top(x): 
+            return 6 - (x - H_SHIFT)**2 # Top curve: f(x)
+            
+        def func_bottom(x):
+            return (x - H_SHIFT)**2 # Bottom curve: g(x)
+        
+        # 1. Title
+        title = Text("Part 2: Area Bounded By Two Curves", font_size=48, color=ORANGE, font=TITLE_FONT)
+        title.to_edge(UP, buff=0.2)
+        
+        self.play(Write(title), run_time=2)
+        self.wait(1.5)
+        
+        # 2. Axes and Top Curve f(x)
+        # SỬA: Adjust x_range to cover the new positive region [0, 5]
+        axes_group = (self.create_axes(x_range=[0, 6, 1], y_range=[0, 8, 1])).next_to(title, DOWN, buff = 0.2)
+        axes = axes_group[0]
+        labels = axes_group[1]
+
+        
+        graph_f = axes.plot(func_top, x_range=[0.8, 5.2], color=YELLOW)
+
+        # Area under f(x) (from intersection a to b)
+        area_f = axes.get_area(graph_f, x_range=[a, b], color=YELLOW, opacity=0.5)
+        
+        # Vertical lines at intersection points
+        line_a = DashedLine(axes.c2p(a, 0), axes.c2p(a, func_top(a)), color=RED)
+        line_b = DashedLine(axes.c2p(b, 0), axes.c2p(b, func_top(b)), color=RED)
+        
+        # Nhãn a và b trên trục x
+        label_a = MathTex("a", color=RED).next_to(axes.c2p(a, 0), DOWN)
+        label_b = MathTex("b", color=RED).next_to(axes.c2p(b, 0), DOWN)
+
+        # Text Formula (Initial) - Simplified Difference Formula
+        text_formula = Text(
+            "Area between 2 curves = Area under f(x) - Area under g(x)",
+            font_size=28,
+            color=WHITE,
+            font=TITLE_FONT
+        ).next_to(axes, DOWN, buff=0.7)
+        
+        # Display Step 1: Top Curve + Area
+        self.play(
+            Create(axes_group),
+            Create(graph_f),
+            Create(line_a), Create(line_b),
+            Write(label_a), Write(label_b),
+            run_time=2.5
+        )
+        self.play(FadeIn(area_f), Write(text_formula), run_time=2)
+        self.wait(2)
+        
+        # 3. Bottom Curve g(x) and Subtraction
+        graph_g = axes.plot(func_bottom, x_range=[0.8, 5.2], color=GREEN)
+        
+        # Area between curves (Target)
+        area_between = axes.get_area(
+            graph_f, x_range=[a, b], 
+            bounded_graph=graph_g, 
+            color=BLUE, 
+            opacity=0.8
+        )
+        
+        # Display Step 2: Bottom Curve
+        self.play(Create(graph_g), run_time=2)
+        self.wait(1)
+        
+        # Display Step 3: Subtraction (Transform full area_f into area_between)
+        self.play(
+            ReplacementTransform(area_f, area_between),
+            run_time=1.5
+        )
+        self.wait(4)
+        
+        # 4. Fade Out Graph, Keep Title & Formula
+        graph_group = VGroup(axes_group, graph_f, graph_g, area_between, line_a, line_b, label_a, label_b)
+        
+        self.play(FadeOut(graph_group), run_time=1.5)
+        self.wait(1)
+        
+        # 5. Transform Formula
+        # Target Formula: Integral
+        integral_formula = MathTex(
+            "A = \\int_a^b [f(x) - g(x)] dx",
+            font_size=60,
+            color=GOLD
+        ).center()
+        
+        self.play(
+            Transform(text_formula, integral_formula),
+            run_time=1.5
+        )
+        self.wait(4)
+        
+        # Final cleanup
+        self.play(FadeOut(text_formula), run_time=1.5)
+            # ------------------------------------------------------------------------------------#
+        # --- NEW PART 3: MULTIPLE INTERSECTIONS ---
+        
+        # 1. Text Block 1 (Description)
+        text_desc = Text(
+            "What if the curves intersect multimple times and the \"upper\" curve may change?",
+            font_size=26,
+            color=WHITE,
+            font=TITLE_FONT
+        ).next_to(title, DOWN, buff=0.3)
+
+        self.play(Write(text_desc), run_time=2.5)
+        self.wait(1.5)
+
+        # 2. Text Block 2 (Let...)
+        text_let = MathTex(
+            "\\text{Let } x_0 < x_1 < \\dots < x_n \\text{ be the points of intersection. Then:}",
+            font_size=32,
+            color=WHITE,
+        ).next_to(text_desc, DOWN, buff=0.2)
+        
+        self.play(Write(text_let), run_time=3)
+        self.wait(2)
+
+        # 3. Final Formula
+        final_formula = MathTex(
+            "\\text{Area} = \\sum_{i=0}^{n-1} \\int_{x_i}^{x_{i+1}} |f(x) - g(x)| dx",
+            font_size=52,
+            color=GREEN
+        ).next_to(text_let, DOWN, buff=1.0).center()
+        
+        self.play(Write(final_formula), run_time=3)
+        self.wait(5)
+        
+        # 4. Fade Out All
+        final_group = VGroup(title, text_desc, text_let, final_formula)
+        self.play(FadeOut(final_group), run_time=1.5)
 
