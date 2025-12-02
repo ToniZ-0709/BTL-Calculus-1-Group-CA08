@@ -693,132 +693,14 @@ class CalculusIntroScene(Scene):
         #------------------------------------------------------------------------------------#
         #------------------------------------------------------------------------------------#
         #------------------------------------------------------------------------------------#
-        self.problem1()
         self.problem2()   
-
-    # ------------------------------------------------------------
-    # PROBLEM 1
-    # ------------------------------------------------------------
-    def problem1(self):
-        TITLE_FONT = "Times New Roman"
-        
-        title = Text("Problem 1: Find the Value of m", font_size=48, color=BLUE, font = TITLE_FONT)
-        title.to_edge(UP)
-        self.play(Write(title), run_time = 2)
-        self.wait(1.5)
-        
-        problem = VGroup(
-            Text("Find positive m such that:", font_size=32, color=WHITE),
-            MathTex("\\text{Area bounded by } y = 2x + 3, y = 0, x = 0, x = m \\text{ equals } 10", font_size=32)
-        ).arrange(DOWN, aligned_edge=LEFT*0.8, buff=0.3)
-        
-        problem.next_to(title, DOWN, buff=0.5)
-        problem.shift(RIGHT*0.1)
-        self.play(Write(problem), run_time = 4)
-        self.wait(4)
-        
-        self.play(FadeOut(problem))
-        self.show_solution(title)
-        self.draw_final_figure(title)
-        self.wait(0.5)
-
-    def show_solution(self, title):
-        step1 = MathTex("\\text{Area} = \\int_0^m (2x + 3) dx = 10", font_size=36)
-        step1.next_to(title, DOWN, buff=0.8)
-        self.play(Write(step1))
-        self.wait(2)
-        
-        step2 = MathTex("F(x) = x^2 + 3x", font_size=36)
-        step2.next_to(step1, DOWN, buff=0.5)
-        self.play(Write(step2), run_time = 2)
-        self.wait(2)
-        
-        step3 = MathTex("\\Rightarrow F(m) - F(0) = m^2 + 3m", font_size=36)
-        step3.next_to(step2, DOWN, buff=0.5)
-        self.play(Write(step3), run_time = 2)
-        self.wait(2)
-        
-        step4 = MathTex("\iff m^2 + 3m = 10", font_size=36)
-        step4.next_to(step3, DOWN, buff=0.5)
-        self.play(Write(step4))
-        self.wait(2)
-        
-        step7 = MathTex("\iff m = -5 \\quad \\text{or} \\quad m = 2", font_size=36)
-        step7.next_to(step4, DOWN, buff=0.5)
-        self.play(Write(step7))
-        self.wait(2)
-        
-        step8 = MathTex("m > 0 \\Rightarrow m = 2", font_size=36, color=GREEN)
-        step8.next_to(step7, DOWN, buff=0.5)
-        self.play(Write(step8), run_time = 2)
-        self.wait(2)
-        
-        self.solution_steps = VGroup(step1, step2, step3, step4, step7, step8)
-
-    def draw_final_figure(self, title):
-        self.play(FadeOut(self.solution_steps))
-        
-        final_title = Text("Final Solution: m = 2", font_size=24, color=GOLD)
-        final_title.next_to(title, DOWN, buff=0.5)
-        self.play(Write(final_title))
-        self.wait(1)
-        
-        axes = Axes(
-            x_range=[0, 4, 1],
-            y_range=[0, 12, 2],
-            x_length=6,
-            y_length=4,
-            axis_config={"color": WHITE}
-        )
-        axes.shift(DOWN * 0.4)
-        
-        graph = axes.plot(lambda x: 2*x + 3, x_range=[0, 3.5], color=GREEN)
-        area = axes.get_area(graph, x_range=[0, 2], color=BLUE, opacity=0.4)
-        
-        func_label = MathTex("y = 2x + 3", font_size=24, color=GREEN)
-        func_label.next_to(axes, UP, buff=0.1)
-        
-        m_label = MathTex("m = 2", font_size=20, color=RED)
-        m_label.next_to(axes.c2p(2, 0), DOWN)
-        
-        area_label = MathTex("\\text{Area} = 10", font_size=20, color=BLUE)
-        area_label.next_to(area, UP, buff=0.2)
-        
-        m_line = DashedLine(axes.c2p(2, 0), axes.c2p(2, 7), color=RED)
-        
-        all_graph_elements = VGroup(
-            axes, graph, area, func_label, m_label, area_label, m_line, final_title
-        )
-        
-        self.play(Create(axes))
-        self.play(Create(graph))
-        self.play(Write(func_label))
-        self.wait(0.5)
-        
-        self.play(Create(m_line))
-        self.play(Write(m_label))
-        self.play(FadeIn(area))
-        self.play(Write(area_label))
-        self.wait(2)
-        
-        calculation = MathTex(
-            "\\int_0^2 (2x + 3) dx = [x^2 + 3x]_0^2 = (4 + 6) - 0 = 10",
-            font_size=28,
-            color=GREEN
-        )
-        calculation.next_to(axes, DOWN * 0.6 , buff=0.6)
-        self.play(Write(calculation))
-        self.wait(3)
-        
-        self.play(FadeOut(all_graph_elements, calculation, title), run_time=2)
-        self.wait(0.5)
 
     # ------------------------------------------------------------
     # PROBLEM 2
     # ------------------------------------------------------------
     def problem2(self):
         TITLE_FONT = "Times New Roman"
-        title2 = Text("Problem 2: Area Calculation", font_size=48, color=BLUE, font = TITLE_FONT)
+        title2 = Text("Problem 1: Area Calculation", font_size=48, color=BLUE, font = TITLE_FONT)
         title2.to_edge(UP)
         self.play(Write(title2), run_time = 2)
         self.wait(1.5)
