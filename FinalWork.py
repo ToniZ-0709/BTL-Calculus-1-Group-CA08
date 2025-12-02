@@ -55,6 +55,7 @@ class CalculusIntroScene(Scene):
             ("Riemann Sums & Approximating Area", YELLOW_B),
             ("Fundamental Theorem of Calculus", GREEN_B),
             ("Geometric Meaning", BLUE_C),
+            ("Volume Problem", PURPLE)
         ]
 
         list_mobjects = VGroup()
@@ -80,7 +81,7 @@ class CalculusIntroScene(Scene):
             # Group the bullet and text
             item_group = VGroup(bullet, item_text)
             item_text.next_to(bullet, RIGHT, buff=0.5)
-            item_group.move_to(start_position + DOWN * i * 1.3)
+            item_group.move_to(start_position + DOWN * i * 1)
             item_group.align_to(Table, LEFT).shift(RIGHT * 1.5) 
             list_mobjects.add(item_group)
 
