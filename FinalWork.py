@@ -1190,3 +1190,281 @@ class CalculusIntroScene(Scene):
         final_group = VGroup(title, text_desc, text_let, final_formula)
         self.play(FadeOut(final_group), run_time=1.5)
 
+
+#--------------------------VOLUME--------------------------#
+
+class VolumeProblem(ThreeDScene):
+    def Volume1(self):
+        TITLE_FONT = "Times New Roman"
+        
+        # --- TITLE AND SUBTITLE (KEPT) ---
+        title = Text("Chapter 4: Volume Problem", font_size=48, color=BLUE, font=TITLE_FONT)
+        subtitle = Text("The volume of a solid with cross-sectional area", font_size=36, color=YELLOW, font=TITLE_FONT)
+        
+        title.to_edge(UP, buff=0.2)
+        subtitle.next_to(title, DOWN, buff=0.3)
+        
+        self.play(Write(title), run_time=1.5)
+        self.play(Write(subtitle), run_time=1.5)
+        self.wait(2)
+        
+        # Clear everything to prepare for the next step
+        self.play(
+            FadeOut(title),
+            FadeOut(subtitle),
+            run_time=1.0
+        )
+        # Scene 1: Show Sphere
+        # --- 1. SETUP 3D SCENE ---
+        # Set the camera angle for a good 3D perspective
+        self.set_camera_orientation(phi=75 * DEGREES, theta=30 * DEGREES)
+        
+        # --- 2. AXES AND INITIAL ROTATION ---
+        # Create 3D Axes
+        axes = ThreeDAxes(
+            x_range=[-5, 5, 1],
+            y_range=[-5, 5, 1],
+            z_range=[-6, 6, 1],
+        ).set_opacity(0.5)
+        
+        self.play(Create(axes, run_time=1.5))
+        
+        # --- AXIS LABELS (Fixed Orientation for Readability) ---
+        x_label = Text("x").set_color(RED).next_to(axes.get_x_axis().get_end(), RIGHT, buff=0.2).shift(OUT*0.5).scale(0.7)
+        y_label = Text("y").set_color(GREEN).next_to(axes.get_y_axis().get_end(), UP, buff=0.2).shift(OUT*0.5).scale(0.7)
+        z_label = Text("z").set_color(BLUE).next_to(axes.get_z_axis().get_end(), OUT, buff=0.2).scale(0.7)
+        
+        self.add_fixed_orientation_mobjects(x_label, y_label, z_label)
+        
+        self.begin_ambient_camera_rotation(rate=0.1) 
+        
+        # --- 3. PARAMETRIC SURFACE DEFINITION (Smaller Radius) ---
+        # Reduced radius from 3 to 1.5 to make the sphere smaller
+        radius = 1.5 
+        
+        # Parametric function for a sphere 
+        def sphere_func(u, v):
+            x = radius * np.sin(v) * np.cos(u)
+            y = radius * np.sin(v) * np.sin(u)
+            z = radius * np.cos(v)
+            return [x, y, z]
+
+        u_max = ValueTracker(0.01)
+        
+        sphere_surface = always_redraw(
+            lambda: Surface(
+                sphere_func,
+                u_range=[0, u_max.get_value()], 
+                v_range=[0, PI], 
+                resolution=(32, 32),
+                checkerboard_colors=[BLUE_D, BLUE_E],
+                fill_opacity=0.8,
+                stroke_color=WHITE,
+                stroke_opacity=0.2
+            )
+        )
+        
+        # --- 4. ANIMATION ---
+        self.add(sphere_surface) 
+        
+        # Animate the surface drawing
+        self.play(
+            u_max.animate.set_value(2 * PI),
+            run_time=4,
+            rate_func=linear
+        )
+        
+        # Hold the final view
+        self.wait(4)
+        
+        # --- 5. CLEANUP ---
+        final_group = VGroup(axes, sphere_surface, x_label, y_label, z_label)
+        self.play(FadeOut(final_group), run_time=1.5)
+        self.stop_ambient_camera_rotation()
+        self.move_camera(phi=0, theta=-PI/2, run_time=1)
+
+        # Scene 2: Prove
+        text_subdivide = MathTex(
+            r"\text{We subdivide } [a, b] \text{ into } n \text{ sub-intervals } \Delta x.",
+            font_size=52,
+            color=WHITE
+        ).to_edge(UP, buff=0.8)
+        
+        self.play(Write(text_subdivide), run_time=2.5)
+        self.wait(2)
+
+        # 2. Formula for x_i (The specific partition point)
+        # Formula: x_i = a + i\Delta x, for i = 0, 1, ..., n.
+        formula_xi = MathTex(
+            r"\text{We denote } x_i = a + i\Delta x, \quad \text{for } i = 0, 1, \dots, n.",
+            font_size=48,
+            color=WHITE
+        ).next_to(text_subdivide, DOWN, buff=0.5)
+        
+        self.play(Write(formula_xi), run_time=2.5)
+        self.wait(1.5)
+
+        # 3. Formula for Delta x
+        # Formula: \Delta x = \frac{b-a}{n}
+        formula_delta_x = MathTex(r"\Delta x = \frac{b-a}{n}", font_size=52, color=WHITE)
+        formula_delta_x.next_to(formula_xi, DOWN, buff=0.5)
+        
+        self.play(Write(formula_delta_x), run_time=2)
+        self.wait(2)
+
+        # 4. Fade Out All
+        final_group = VGroup(text_subdivide, formula_delta_x, formula_xi)
+        self.play(FadeOut(final_group), run_time=1.5)
+        self.wait(0.5) 
+
+        axes = ThreeDAxes(x_range=[-6, 6, 1], y_range=[-6, 6, 1], z_range=[-6, 6, 1])
+        self.play(Create(axes), run_time=3)
+
+
+        self.wait()
+        r = ValueTracker(2)
+        dx = ValueTracker(0.5)
+        h = ValueTracker(3)
+        slice = always_redraw(lambda: Cylinder(radius=axes.c2p(r.get_value())[0], height=axes.c2p(dx.get_value())[0], direction=RIGHT, resolution=(32, 32), checkerboard_colors=False).set_color(BLUE_B))
+
+        self.play(Create(slice))
+        self.wait()
+        self.move_camera(phi=PI/2, theta=-PI/4)
+        self.wait()
+
+        dxBrace=always_redraw(lambda: Brace(always_redraw(lambda: Line(start=axes.c2p(0-(dx.get_value()/2), r.get_value(), 0), end=axes.c2p(0+(dx.get_value()/2), r.get_value(), 0)  )), direction=Y_AXIS ).set_color(GREEN_B))
+        rBrace=always_redraw(lambda: Brace(always_redraw(lambda: Line(start=axes.c2p(0+(dx.get_value()/2), r.get_value(), 0), end=axes.c2p(0+(dx.get_value()/2), -r.get_value(), 0)  )), direction=X_AXIS ).set_color(RED_B))
+
+        self.move_camera(phi=0, theta=-PI/2)
+
+        self.play(Create(VGroup(dxBrace, rBrace)))
+        self.wait()
+
+
+        cylinderVol=MathTex(r'V_i \approx A(x_i^*)\Delta x', color=WHITE).shift(UP*3).add_background_rectangle(BLACK, 0.5)
+        cylinderVolLabel=Text('"Volume of the i-th slice"').set_color_by_gradient(GREEN_B, RED_B).scale(0.7).shift(DOWN*3)
+        self.play(Create(cylinderVol))
+        self.wait()
+        self.play(Write(cylinderVolLabel))
+        self.wait()
+        self.play(r.animate.set_value(3))
+        self.play(r.animate.set_value(2))
+        self.play(dx.animate.set_value(0.2))
+        self.play(dx.animate.set_value(0.5))
+
+        self.play(FadeOut(VGroup(dxBrace, rBrace, slice, cylinderVolLabel, axes)))
+        self.wait()
+        self.play(cylinderVol.animate.to_corner(UP + RIGHT*0.5), run_time = 1.5)
+        self.add_fixed_in_frame_mobjects(cylinderVol)
+
+        # Scene 1: Show Sphere
+        # --- 1. SETUP 3D SCENE ---
+        # Set the camera angle for a good 3D perspective
+        self.set_camera_orientation(phi=75 * DEGREES, theta=30 * DEGREES)
+        
+        # --- 2. AXES AND INITIAL ROTATION ---
+        # Create 3D Axes
+        axes = ThreeDAxes(
+            x_range=[-5, 5, 1],
+            y_range=[-5, 5, 1],
+            z_range=[-6, 6, 1],
+        ).set_opacity(0.5)
+        
+        self.play(Create(axes, run_time=1.5))
+        
+        # --- AXIS LABELS (Fixed Orientation for Readability) ---
+        x_label = Text("x").set_color(RED).next_to(axes.get_x_axis().get_end(), RIGHT, buff=0.2).shift(OUT*0.5).scale(0.7)
+        y_label = Text("y").set_color(GREEN).next_to(axes.get_y_axis().get_end(), UP, buff=0.2).shift(OUT*0.5).scale(0.7)
+        z_label = Text("z").set_color(BLUE).next_to(axes.get_z_axis().get_end(), OUT, buff=0.2).scale(0.7)
+        
+        self.add_fixed_orientation_mobjects(x_label, y_label, z_label)
+        
+        self.begin_ambient_camera_rotation(rate=0.1) 
+        
+        # --- 3. PARAMETRIC SURFACE DEFINITION (Smaller Radius) ---
+        # Reduced radius from 3 to 1.5 to make the sphere smaller
+        radius = 1.5 
+        
+        # Parametric function for a sphere 
+        def sphere_func(u, v):
+            x = radius * np.sin(v) * np.cos(u)
+            y = radius * np.sin(v) * np.sin(u)
+            z = radius * np.cos(v)
+            return [x, y, z]
+
+        u_max = ValueTracker(0.01)
+        
+        sphere_surface = always_redraw(
+            lambda: Surface(
+                sphere_func,
+                u_range=[0, u_max.get_value()], 
+                v_range=[0, PI], 
+                resolution=(32, 32),
+                checkerboard_colors=[BLUE_D, BLUE_E],
+                fill_opacity=0.8,
+                stroke_color=WHITE,
+                stroke_opacity=0.2
+            )
+        )
+        
+        # --- 4. ANIMATION ---
+        self.add(sphere_surface) 
+        
+        # Animate the surface drawing
+        self.play(
+            u_max.animate.set_value(2 * PI),
+            run_time=4,
+            rate_func=linear
+        )
+        pos = UR * 3.5 + DOWN * 0.3 + RIGHT*0.5
+
+        Sum1 = MathTex(
+            r"V \approx \sum_{i=1}^{n} A(x_i^{*})\,\Delta x"
+        ).add_background_rectangle().move_to(pos)
+
+        Sum2 = MathTex(
+            r"V = \lim_{n\to\infty}\sum_{i=1}^{n}A(x_i^{*})\,\Delta x"
+        ).add_background_rectangle().move_to(pos)
+
+        FinalIntegral = MathTex(
+            r"V = \int_{a}^{b} A(x)\,dx"
+        ).add_background_rectangle().scale(1.5).center()
+
+        Title = Text(
+            "The volume of a solid with cross-sectional area:",
+            font_size=36,
+            color=YELLOW
+        ).add_background_rectangle().to_edge(UP, buff=1)
+
+        # Show first sum
+        self.play(FadeOut(cylinderVol))
+        self.add_fixed_in_frame_mobjects(Sum1)
+        self.play(Write(Sum1))
+        self.wait(2)
+        self.play(FadeOut(Sum1))
+        self.wait(0.2)
+
+        # Show second sum
+        self.add_fixed_in_frame_mobjects(Sum2)
+        self.play(Write(Sum2))
+        self.wait(2)
+
+        # Clean 3D scene before final integral
+        self.play(FadeOut(VGroup(axes, sphere_surface, x_label, y_label, z_label)), FadeOut(Sum2), run_time=1.5)
+        self.stop_ambient_camera_rotation()
+        self.move_camera(phi=0, theta=-PI/2, run_time=1)
+        self.wait(0.5)
+
+        self.play(Write(Title))
+        self.play(Write(FinalIntegral))
+        self.add_fixed_in_frame_mobjects(FinalIntegral, Title)
+        self.wait(2)
+
+        self.play(FadeOut(FinalIntegral), FadeOut(Title))
+        self.wait() 
+             
+    
+    def construct(self):
+        self.Volume1()
+
+        
