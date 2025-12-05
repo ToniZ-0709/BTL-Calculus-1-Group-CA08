@@ -1199,7 +1199,7 @@ class VolumeProblem(ThreeDScene):
         
         # --- TITLE AND SUBTITLE (KEPT) ---
         title = Text("Chapter 4: Volume Problem", font_size=48, color=BLUE, font=TITLE_FONT)
-        subtitle = Text("The volume of a solid with cross-sectional area", font_size=36, color=YELLOW, font=TITLE_FONT)
+        subtitle = Text("Part 1: The volume of a solid with cross-sectional area", font_size=36, color=YELLOW, font=TITLE_FONT)
         
         title.to_edge(UP, buff=0.2)
         subtitle.next_to(title, DOWN, buff=0.3)
@@ -1463,8 +1463,628 @@ class VolumeProblem(ThreeDScene):
         self.play(FadeOut(FinalIntegral), FadeOut(Title))
         self.wait() 
              
+    def Volume2(self):
+        TITLE_FONT = "Times New Roman"
+        
+        # --- TITLE AND SUBTITLE (KEPT) ---
+        title = Text("Chapter 4: Volume Problem", font_size=48, color=BLUE, font=TITLE_FONT)
+        subtitle = Text("Part 2: The volume of a solid of revolution", font_size=36, color=ORANGE, font=TITLE_FONT)
+        
+        title.to_edge(UP, buff=0.2)
+        subtitle.next_to(title, DOWN, buff=0.3)
+        
+        self.play(Write(title), run_time=1.5)
+        self.play(Write(subtitle), run_time=1.5)
+        self.wait(2)
+        
+        # Clear everything to prepare for the next step
+        self.play(
+            FadeOut(title),
+            FadeOut(subtitle),
+            run_time=1.0
+        )
+
+        # Part 1
+        self.set_camera_orientation(phi=0, theta = -PI/2)
+
+        ax = ThreeDAxes(
+            x_range = [0,4.1,5],
+            x_length = 5,
+            y_range = [-4, 4.1, 5],
+            y_length = 5,
+            z_range=[-4,4,5],
+            z_length = 5,
+        )#.add_coordinates()
+
+
+        trace = ax.plot(lambda x: -0.25 * x ** 2 + 4, x_range=[0,4], color = BLUE)
+        function = ax.plot(lambda x: -0.25 * x ** 2 + 4, x_range=[1,3], color = YELLOW)
+        region = ax.get_area(function, x_range=[1,3], color = [BLUE_B, BLUE_D])
+        rect = ax.plot(lambda x: 3.0975, x_range=[1.8,2], color = RED)
+        rectarea = ax.get_area(rect, x_range=[1.8,2], color = [BLUE_B, RED_C])
+
+        e = ValueTracker(2 * PI)
+
+        surface = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    v, 3.0975 * np.cos(u), 3.0975 * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[1.8,2],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        floorbase = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    1.8, v * np.cos(u), v*np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[0,3.0975],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        topbase = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    2, v * np.cos(u), v*np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[0,3.0975],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        # Labels
+        a_label = MathTex("a").set_color(YELLOW).move_to(
+            ax.c2p(1, 0, 0)
+        ).shift(DOWN * 0.4)
+        
+        b_label = MathTex("b").set_color(YELLOW).move_to(
+            ax.c2p(3, 0, 0)
+        ).shift(DOWN * 0.4)
+        Fxi = MathTex(r"f(x_i)").scale(0.7).set_color(WHITE).next_to(function, UP, buff = 0.05)
+        xi = MathTex(r"x_i").scale(0.7).set_color(WHITE).move_to(ax.c2p(1.9, 0, 0)).shift(DOWN * 0.2)
+        delx = MathTex(r"\Delta x").set_color(WHITE).move_to(ax.c2p(1.9, 0, 0)).shift(DOWN * 0.6)
+
+
+        self.add(ax,trace)
+        self.wait(2)
+        self.play(Create(function),Create(region), Create(a_label), Create(b_label))
+        self.wait(2)
+        self.play(FadeOut(trace))
+        self.play(Create(rect),Create(rectarea), Create(Fxi), Create(xi), Create(delx))
+        self.wait(2)
+        all_labels = VGroup(a_label, b_label, Fxi, xi, delx)
+        self.play(FadeOut(all_labels))
+
+        # Part 2
+        self.move_camera(phi=45 * DEGREES, theta=-45 * DEGREES)
+        self.wait(2)
+        self.begin_ambient_camera_rotation(rate=0.1)
+
+        self.play(
+            Rotating(
+                VGroup(rect,rectarea),
+                axis=RIGHT,
+                radians=2 * PI,
+                about_point=ax.c2p(0, 0, 0),
+            ),
+            e.animate.set_value(2 * PI),
+            run_time=7,
+            rate_func=linear,
+        )
+        self.wait(2)
+#        self.begin_ambient_camera_rotation(rate=0.1)
+        self.play(Create(surface), Create(floorbase), Create(topbase))
+        self.wait(2)
+        self.move_camera(phi=45 * DEGREES, theta=45 * DEGREES)
+
+#        self.begin_ambient_camera_rotation(rate=0.1)
+        self.move_camera(phi=-45 * DEGREES, theta=45 * DEGREES)
+        self.wait(5)
+        self.stop_ambient_camera_rotation()
+        self.wait(0.5)
+        
+        pos = UL * 3.5 + DOWN * 0.3 + LEFT*0.7
+        Vol1 = MathTex(r"V_i = \pi [f(x_i)]^2 \Delta x").add_background_rectangle().move_to(pos)
+
+        self.add_fixed_in_frame_mobjects(Vol1)
+        self.play(Write(Vol1))
+        self.wait(3)
+        self.play(FadeOut(Vol1), FadeOut(surface), FadeOut(floorbase), FadeOut(topbase), FadeOut(ax), FadeOut(rect), FadeOut(rectarea), FadeOut(function), FadeOut(region))
+        self.wait(2)
+
+        # Part 3:
+        self.set_camera_orientation(phi=0, theta = -PI/2)
+
+        ax = ThreeDAxes(
+            x_range = [0,4.1,5],
+            x_length = 5,
+            y_range = [-4, 4.1, 5],
+            y_length = 5,
+            z_range=[-4,4,5],
+            z_length = 5,
+        )#.add_coordinates()
+
+
+
+        trace = ax.plot(lambda x: -0.25 * x ** 2 + 4, x_range=[0,4], color = BLUE)
+        function = ax.plot(lambda x: -0.25 * x ** 2 + 4, x_range=[1,3], color = YELLOW)
+        region = ax.get_area(function, x_range=[1,3], color = [BLUE_B, BLUE_D])
+#        rect = ax.get_riemann_rectangles(lambda x: -0.25 * x ** 2 + 4, x_range=[1.8,2], dx=0.2, color=(TEAL, BLUE_B, DARK_BLUE), input_sample_type="right",)
+        rect = ax.get_riemann_rectangles(function, x_range=[1,3], dx=0.2, input_sample_type="center")
+
+
+        e = ValueTracker(2 * PI)
+
+#        surface = []
+#        for i in range(0,10):
+#            t = always_redraw(
+#                lambda: Surface(
+#                    lambda u, v: ax.c2p(
+#                        v, (-0.25 * (0.2 * i + 1.1) ** 2 + 4) * np.cos(u), (-0.25 * (0.2 * i + 1.1) ** 2 + 4) * np.sin(u)
+#                    ),
+#                    u_range = [0, e.get_value()],
+#                    v_range=[1 + 0.2 * i, 1.2 + 0.2 * i],
+#                    checkerboard_colors = [BLUE_B, BLUE_D],
+#                )
+#            )
+#            surface.append(t)
+
+        s0 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    v, (-0.25 * (0.2 * 0 + 1.1) ** 2 + 4) * np.cos(u), (-0.25 * (0.2 * 0 + 1.1) ** 2 + 4) * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[1 + 0.2 * 0, 1.2 + 0.2 * 0],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        s1 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    v, (-0.25 * (0.2 * 1 + 1.1) ** 2 + 4) * np.cos(u), (-0.25 * (0.2 * 1 + 1.1) ** 2 + 4) * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[1 + 0.2 * 1, 1.2 + 0.2 * 1],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        s2 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    v, (-0.25 * (0.2 * 2 + 1.1) ** 2 + 4) * np.cos(u), (-0.25 * (0.2 * 2 + 1.1) ** 2 + 4) * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[1 + 0.2 * 2, 1.2 + 0.2 * 2],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        s3 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    v, (-0.25 * (0.2 * 3 + 1.1) ** 2 + 4) * np.cos(u), (-0.25 * (0.2 * 3 + 1.1) ** 2 + 4) * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[1 + 0.2 * 3, 1.2 + 0.2 * 3],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        s4 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    v, (-0.25 * (0.2 * 4 + 1.1) ** 2 + 4) * np.cos(u), (-0.25 * (0.2 * 4 + 1.1) ** 2 + 4) * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[1 + 0.2 * 4, 1.2 + 0.2 * 4],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        s5 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    v, (-0.25 * (0.2 * 5 + 1.1) ** 2 + 4) * np.cos(u), (-0.25 * (0.2 * 5 + 1.1) ** 2 + 4) * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[1 + 0.2 * 5, 1.2 + 0.2 * 5],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        s6 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    v, (-0.25 * (0.2 * 6 + 1.1) ** 2 + 4) * np.cos(u), (-0.25 * (0.2 * 6 + 1.1) ** 2 + 4) * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[1 + 0.2 * 6, 1.2 + 0.2 * 6],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        s7 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    v, (-0.25 * (0.2 * 7 + 1.1) ** 2 + 4) * np.cos(u), (-0.25 * (0.2 * 7 + 1.1) ** 2 + 4) * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[1 + 0.2 * 7, 1.2 + 0.2 * 7],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        s8 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    v, (-0.25 * (0.2 * 8 + 1.1) ** 2 + 4) * np.cos(u), (-0.25 * (0.2 * 8 + 1.1) ** 2 + 4) * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[1 + 0.2 * 8, 1.2 + 0.2 * 8],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        s9 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    v, (-0.25 * (0.2 * 9 + 1.1) ** 2 + 4) * np.cos(u), (-0.25 * (0.2 * 9 + 1.1) ** 2 + 4) * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[1 + 0.2 * 9, 1.2 + 0.2 * 9],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+
+
+
+        f0 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    0.2*0+1, v * np.cos(u), v * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[0, -0.25 * (0.2 * 0 + 1) ** 2 + 4],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        f1 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    0.2*1+1, v * np.cos(u), v * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[0, -0.25 * (0.2 * 1 + 1) ** 2 + 4],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        f2 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    0.2*2+1, v * np.cos(u), v * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[0, -0.25 * (0.2 * 2 + 1) ** 2 + 4],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        f3 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    0.2*3+1, v * np.cos(u), v * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[0, -0.25 * (0.2 * 3 + 1) ** 2 + 4],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        f4 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    0.2*4+1, v * np.cos(u), v * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[0, -0.25 * (0.2 * 4 + 1) ** 2 + 4],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        f5 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    0.2*5+1, v * np.cos(u), v * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[0, -0.25 * (0.2 * 5 + 1) ** 2 + 4],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        f6 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    0.2*6+1, v * np.cos(u), v * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[0, -0.25 * (0.2 * 6 + 1) ** 2 + 4],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        f7 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    0.2*7+1, v * np.cos(u), v * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[0, -0.25 * (0.2 * 7 + 1) ** 2 + 4],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        f8 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    0.2*8+1, v * np.cos(u), v * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[0, -0.25 * (0.2 * 8 + 1) ** 2 + 4],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        f9 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    0.2*9+1, v * np.cos(u), v * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[0, -0.25 * (0.2 * 9 + 1) ** 2 + 4],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        f10 = always_redraw(
+            lambda: Surface(
+                lambda u, v: ax.c2p(
+                    0.2*10+1, v * np.cos(u), v * np.sin(u)
+                ),
+                u_range = [0, e.get_value()],
+                v_range=[0, -0.25 * (0.2 * 10 + 1) ** 2 + 4],
+                checkerboard_colors = [BLUE_B, BLUE_D],
+            )
+        )
+
+        self.add(ax,function,region)
+        self.play(Create(rect))
+        self.move_camera(phi=45 * DEGREES, theta=-45 * DEGREES)
+        self.wait(1)
+        self.play(FadeOut(rect,region))
+
+        self.play(Create(s0),Create(f1))
+        self.play(Create(s1),Create(f2))
+        self.play(Create(s2),Create(f3))
+        self.play(Create(s3),Create(f4))
+        self.play(Create(s4),Create(f5))
+        self.play(Create(s5),Create(f6))
+        self.play(Create(s6),Create(f7))
+        self.play(Create(s7),Create(f8))
+        self.play(Create(s8),Create(f9))
+        self.play(Create(s9),Create(f10))
+        self.add(f0)
+        self.begin_ambient_camera_rotation(rate=0.1)
+        self.wait()
+
+        self.move_camera(phi=45 * DEGREES, theta=0 * DEGREES)
+        Vol2 = MathTex(r"V \approx \sum_{i=1}^{n} \pi [f(x_i)]^2 \Delta x").add_background_rectangle().move_to(pos)
+        self.add_fixed_in_frame_mobjects(Vol2)
+        self.play(Write(Vol2))
+        self.wait(3)
+        self.play(FadeOut(Vol2))
+        self.wait()
+
+
+        self.move_camera(phi=-45 * DEGREES, theta=45 * DEGREES)
+        Vol3 = MathTex(r"V = \int_{a}^{b} \pi [f(x)]^2 dx").add_background_rectangle().move_to(pos)
+        self.add_fixed_in_frame_mobjects(Vol3)
+        self.play(Write(Vol3))
+        self.wait(4)
+        self.stop_ambient_camera_rotation()
+        self.play(FadeOut(Group(*self.mobjects)))
+        self.move_camera(phi=0, theta=-PI/2, run_time=1)
+        
+    def VolumeApplication(self):
+        TITLE_FONT = "Times New Roman"
+        
+        # --- TITLE AND SUBTITLE (KEPT) ---
+        title = Text("Problem 2", font_size=48, color=BLUE, font=TITLE_FONT)
+        subtitle = Text("Find the volume of a barrel", font_size=36, color=ORANGE, font=TITLE_FONT)
+        
+        title.to_edge(UP, buff=0.2)
+        subtitle.next_to(title, DOWN, buff=0.3)
+        
+        self.play(Write(title), run_time=1.5)
+        self.play(Write(subtitle), run_time=1.5)
+        self.wait(2)
+        
+        # Slide 0: Show problem statement
+        problem_text = Text(
+            "A wine barrel has:\n"
+            "+ Base radius = 30 cm\n"
+            "+ Middle radius = 40 cm\n"
+            "+ Height = 1 m\n"
+            "Knowing that the outer surface is formed by parabolas,\n"
+            "calculate the volume of the barrel.",
+            font_size=28,
+            line_spacing=1.0
+        )
+        self.play(Write(problem_text), run_time = 8)
+        self.wait(5)
+        self.play(
+            FadeOut(problem_text),
+            run_time=1.0
+        )
+        
+        # Slide 1: 
+        convert_text = MathTex(
+            r"30cm = 3dm,\ 40cm = 4dm,\ 1m = 10dm",
+            font_size=42
+        )
+        self.play(Write(convert_text), run_time=3)
+        self.wait(2)
+        self.play(FadeOut(convert_text), FadeOut(title), FadeOut(subtitle))
+
+        # Slide 2: 2D Graph
+        axes_2d = Axes(
+            x_range=[-6, 6, 1],  # trục x: chiều cao (y)
+            y_range=[0, 6, 1],   # trục y: bán kính (x)
+            x_length=5,
+            y_length=4,
+            axis_config={"color": BLUE},
+        ).scale(1.2)
+        
+        # Nhãn trục
+        x_label_2d = MathTex("y\\ (height)", font_size=24).next_to(axes_2d.x_axis.get_end(), RIGHT)
+        y_label_2d = MathTex("x\\ (radius)", font_size=24).next_to(axes_2d.y_axis.get_top(), UP)
+        
+        # Vẽ các điểm
+        A_2d = Dot(axes_2d.c2p(0, 4), color=RED, radius=0.04)
+        B_2d = Dot(axes_2d.c2p(5, 3), color=GREEN, radius=0.04)
+        C_2d = Dot(axes_2d.c2p(-5, 3), color=YELLOW, radius=0.04)
+        
+        A_label_2d = MathTex("A(4,0)", font_size=24).next_to(A_2d, UP, buff=0.05)
+        B_label_2d = MathTex("B(3,5)", font_size=24).next_to(B_2d, UP+RIGHT, buff=0.05)
+        C_label_2d = MathTex("C(3,-5)", font_size=24).next_to(C_2d, UP+LEFT, buff=0.05)
+        
+        # Function
+        def f(y):
+            return -1/25 * y**2 + 4
+        
+        curve_2d = axes_2d.plot(f, x_range=[-5.5, 5.5], color=WHITE)
+        
+        # Show all
+        self.play(Write(axes_2d), Write(x_label_2d), Write(y_label_2d))
+        self.play(Write(A_2d), Write(B_2d), Write(C_2d))
+        self.play(Write(A_label_2d), Write(B_label_2d), Write(C_label_2d))
+        self.play(Create(curve_2d), run_time=1.5)
+        self.wait(2.5)
+        
+        # FadeOut
+        self.play(
+            FadeOut(axes_2d), FadeOut(x_label_2d), FadeOut(y_label_2d),
+            FadeOut(A_2d), FadeOut(B_2d), FadeOut(C_2d),
+            FadeOut(A_label_2d), FadeOut(B_label_2d), FadeOut(C_label_2d),
+            FadeOut(curve_2d)
+        )
+        
+        # Slide 3: 3D Graph 
+        self.move_camera(phi=75 * DEGREES, theta=30 * DEGREES)
+        
+        axes_3d = ThreeDAxes(
+            x_range=[-5, 5, 1],
+            y_range=[-5, 5, 1],
+            z_range=[0, 5, 1],
+            x_length=3,
+            y_length=3,
+            z_length=2.5,
+        ).scale(0.7)
+        
+        def surface_func(u, v):
+            radius = f(v)
+            x = radius * np.cos(u) * 0.5  # Scale down
+            y = v * 0.5  # Scale down
+            z = radius * np.sin(u) * 0.5  # Scale down
+            return np.array([x, y, z])
+        
+        surface = Surface(
+            surface_func,
+            u_range=[0, 2 * PI],
+            v_range=[-5, 5],
+            resolution=(24, 24),
+            color=BLUE,
+            fill_opacity=0.6
+        )
+        
+        self.play(Create(axes_3d), Create(surface), run_time=2)
+        
+        # Xoay camera để quan sát
+        self.begin_ambient_camera_rotation(rate=0.3)
+        self.wait(5)
+        self.stop_ambient_camera_rotation()
+        self.wait(0.5)
+        
+        # FadeOut
+        self.play(FadeOut(axes_3d), FadeOut(surface), run_time=1)
+        
+        # Reset Camera Angle
+        self.move_camera(phi=0, theta=-90 * DEGREES)
+        
+        # Slide 4: Solve Equations
+        sol = Text("Solution", font_size=48, color=GREEN, font="Times New Roman").to_edge(UP, buff=0.2)
+        self.play(Write(sol))
+        self.wait(1)
+
+        eq1 = MathTex(r"f(0) = a(0)^2 + b(0) + c = 4", font_size=28).next_to(sol, DOWN, buff=0.5)
+        eq2 = MathTex(r"f(5) = a(5)^2 + b(5) + c = 3", font_size=28).next_to(eq1, DOWN, buff=0.3)
+        eq3 = MathTex(r"f(-5) = a(-5)^2 + b(-5) + c = 3", font_size=28).next_to(eq2, DOWN, buff=0.3)
+        
+        self.play(Write(eq1))
+        self.wait(0.5)
+        self.play(Write(eq2))
+        self.wait(0.5)
+        self.play(Write(eq3))
+        self.wait(1.5)
+        
+        solution = MathTex(r"\implies a = -\frac{1}{25},\ b = 0,\ c = 4", 
+        font_size=36, color=GREEN).next_to(eq3, DOWN, buff=0.6)
+        self.play(Write(solution))
+        self.wait(2)
+        
+        final_func = MathTex(r"\implies x = f(y) = -\frac{1}{25}y^2 + 4", 
+        font_size=36, color=YELLOW).next_to(solution, DOWN, buff=0.6)
+        self.play(Write(final_func))
+        self.wait(3)
+        
+        # Slide 5: Finalize
+        self.play(FadeOut(eq1), FadeOut(eq2), FadeOut(eq3), 
+                FadeOut(solution), FadeOut(final_func))
+        
+        integral = MathTex(
+            r"V = \pi\int_{-5}^{5} \left(-\frac{1}{25}y^2 + 4\right)^2 dy",
+            font_size=36
+        ).to_edge(UP, buff=1.5)
+        self.play(Write(integral))
+        self.wait(2)
+        
+        result = MathTex(
+            r"\implies V = \frac{406}{3}\pi \approx 425.2\ dm^3 = 425.2\ liters",
+            font_size=42,
+            color=GREEN
+        ).next_to(integral, DOWN, buff=0.8)
+        self.play(Write(result))
+        
+        box = SurroundingRectangle(result, color=YELLOW, buff=0.3)
+        self.play(Write(box), run_time = 1.5)
+        self.wait(4)
+        self.play(FadeOut(box), FadeOut(result), FadeOut(integral), FadeOut(sol))
     
     def construct(self):
         self.Volume1()
+        self.Volume2()
+        self.VolumeApplication()
 
         
